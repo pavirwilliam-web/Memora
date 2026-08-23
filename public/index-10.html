@@ -1,0 +1,1730 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memora</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<style>
+  :root{
+    --bg: #FAF7FC;
+    --card: #FFFFFF;
+    --lavender: #A78BFA;
+    --lavender-soft: #EDE6FC;
+    --mint: #8FD9C4;
+    --mint-soft: #E3F7F1;
+    --peach: #FFC9B3;
+    --peach-soft: #FFEFE7;
+    --gold: #F5C451;
+    --text: #2D2A3D;
+    --muted: #8B87A3;
+    --border: #ECE7F5;
+    --danger: #E8747A;
+    --radius: 18px;
+    --radius-sm: 12px;
+    --shadow: 0 8px 24px rgba(167,139,250,0.12);
+  }
+  body.dark{
+    --bg: #191623;
+    --card: #241F33;
+    --lavender: #B79CFF;
+    --lavender-soft: #322A47;
+    --mint: #7FD6BE;
+    --mint-soft: #22362F;
+    --peach: #FFC9B3;
+    --peach-soft: #3A2C26;
+    --gold: #F5C451;
+    --text: #EDEAF7;
+    --muted: #9C97B5;
+    --border: #342C48;
+    --danger: #F08A90;
+    --shadow: 0 8px 24px rgba(0,0,0,0.35);
+  }
+  body.dark input[type=text], body.dark input[type=password], body.dark textarea, body.dark select{ background:#1E1A2B; color:var(--text); }
+  body.dark .tab-circle{ background:var(--card); }
+  body.dark .modal-card{ background:var(--card); }
+  body.dark .pending-item{ background:#332B18; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{ background: var(--bg); color: var(--text); font-family:'Inter',sans-serif; -webkit-font-smoothing:antialiased; min-height:100vh; }
+  h1,h2,h3,h4{ font-family:'Poppins', sans-serif; margin:0; }
+  #app{ max-width:520px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column; position:relative; }
+  .header{ display:flex; align-items:center; justify-content:space-between; padding:16px 18px 12px; background: linear-gradient(135deg, var(--lavender-soft), var(--mint-soft)); gap:8px; }
+  .logo-row{ display:flex; align-items:center; gap:9px; }
+  .logo-mark{ width:36px;height:36px;border-radius:11px; background: linear-gradient(135deg, var(--lavender), var(--peach)); display:flex;align-items:center;justify-content:center; color:white; font-family:'Poppins',sans-serif; font-weight:800; font-size:17px; box-shadow: var(--shadow); transform: rotate(-4deg); flex-shrink:0; }
+  .brand{ font-size:19px; font-weight:800; letter-spacing:-0.02em; }
+  .user-chip{ display:flex; align-items:center; gap:6px; background:white; padding:5px 10px 5px 5px; border-radius:999px; font-size:12px; font-weight:600; box-shadow: var(--shadow); cursor:pointer; border:none; white-space:nowrap; }
+  .points-badge{ color: var(--lavender); font-weight:800; }
+  main{ flex:1; padding: 16px 74px 24px 18px; }
+  .card{ background: var(--card); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); margin-bottom: 14px; border: 1px solid var(--border); }
+  .section-title{ font-size:21px; font-weight:800; margin-bottom:4px; }
+  .section-sub{ color:var(--muted); font-size:13.5px; margin-bottom:16px; }
+  input[type=text], input[type=password], textarea, select{ width:100%; border: 1.5px solid var(--border); background: #FBFAFE; border-radius: var(--radius-sm); padding: 11px 13px; font-family:'Inter',sans-serif; font-size:14.5px; color: var(--text); outline:none; transition: border-color .15s; }
+  input:focus, textarea:focus, select:focus{ border-color: var(--lavender); }
+  textarea{ min-height:90px; resize:vertical; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:7px; border:none; border-radius: 999px; padding: 11px 18px; font-family:'Inter',sans-serif; font-weight:700; font-size:13.5px; cursor:pointer; transition: transform .1s, filter .1s; }
+  .btn:active{ transform: scale(0.96); filter: brightness(0.85); }
+  .btn-primary{ background: var(--lavender); color:white; }
+  .btn-mint{ background: var(--mint); color:white; }
+  .btn-peach{ background: var(--peach); color: #6B3A2C; }
+  .btn-gold{ background: var(--gold); color:#5C4008; }
+  .btn-outline{ background:white; color:var(--text); border:1.5px solid var(--border); }
+  .btn-danger{ background: var(--danger); color:white; }
+  .btn-block{ width:100%; }
+  .btn-sm{ padding:7px 12px; font-size:12px; }
+  .btn[disabled]{ opacity:.5; cursor:default; }
+  .row{ display:flex; gap:9px; }
+  .wrap{ flex-wrap:wrap; }
+  .tag{ display:inline-block; font-size:10.5px; font-weight:700; background: var(--peach-soft); color:#B0603F; padding:4px 10px; border-radius:999px; margin:0 6px 6px 0; }
+  .tag-mint{ background: var(--mint-soft); color:#2E9C7F; }
+  .tag-lav{ background: var(--lavender-soft); color:#6D4FC4; }
+  .notion-item{ padding:13px; border-radius: var(--radius-sm); background:#FBFAFE; border:1px solid var(--border); margin-bottom:9px; cursor:pointer; }
+  .notion-item:active{ background: var(--lavender-soft); }
+  .notion-title{ font-weight:700; font-size:14.5px; margin-bottom:2px; }
+  .notion-cat{ font-size:11.5px; color:var(--muted); }
+  .notion-meta{ display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+  .empty{ text-align:center; padding: 26px 10px; color:var(--muted); font-size:13.5px; }
+  .empty-emoji{ font-size:32px; margin-bottom:8px; }
+  nav.tabbar{ position:fixed; top:50%; right:14px; transform:translateY(-50%); display:flex; flex-direction:column; align-items:center; gap:11px; z-index:40; max-height:88vh; overflow-y:auto; padding:2px; }
+  .tab-circle{ width:46px; height:46px; border-radius:50%; background:white; border:none; display:flex; align-items:center; justify-content:center; color:var(--muted); box-shadow: var(--shadow); cursor:pointer; flex-shrink:0; transition: background .15s, color .15s, transform .1s; }
+  .tab-circle svg{ width:20px; height:20px; }
+  .tab-circle.active{ background: linear-gradient(135deg, var(--lavender), var(--peach)); color:white; }
+  .tab-circle:active{ transform: scale(0.9); }
+  .option-btn{ display:block; width:100%; text-align:left; padding:11px 13px; margin-bottom:7px; border-radius: var(--radius-sm); border:1.5px solid var(--border); background:#FBFAFE; font-family:'Inter',sans-serif; font-size:13.5px; font-weight:500; color:var(--text); cursor:pointer; }
+  .option-btn.selected{ border-color: var(--lavender); background: var(--lavender-soft); font-weight:700; }
+  .option-btn.correct{ border-color:#4CAF7D; background:#E4F7ED; font-weight:700; }
+  .option-btn.wrong{ border-color: var(--danger); background:#FBEAEB; font-weight:700; }
+  .msg{ display:flex; flex-direction:column; margin-bottom:9px; max-width:82%; }
+  .msg.mine{ align-self:flex-end; align-items:flex-end; margin-left:auto; }
+  .msg-bubble{ background:#FBFAFE; border:1px solid var(--border); border-radius:14px; padding:9px 12px; font-size:13.5px; }
+  .msg.mine .msg-bubble{ background: var(--lavender-soft); }
+  .msg-name{ font-size:10.5px; color:var(--muted); margin-bottom:2px; font-weight:700; }
+  .msg-actions{ display:flex; gap:6px; margin-top:3px; }
+  .msg-action-btn{ font-size:10px; color:var(--muted); background:none; border:none; cursor:pointer; padding:2px 4px; }
+  .chat-list{ display:flex; flex-direction:column; height:calc(100vh - 340px); min-height:240px; overflow-y:auto; margin-bottom:12px; padding-right:2px;}
+  .spinner{ width:17px;height:17px;border-radius:50%; border:3px solid rgba(255,255,255,0.4); border-top-color:white; animation: spin .7s linear infinite; display:inline-block; }
+  .spinner-dark{ border:3px solid var(--border); border-top-color: var(--lavender); }
+  @keyframes spin{ to{ transform: rotate(360deg);} }
+  .name-gate{ position:fixed; inset:0; background: linear-gradient(160deg, var(--lavender-soft), var(--mint-soft)); display:flex; align-items:center; justify-content:center; padding:24px; z-index:50; overflow-y:auto; }
+  .name-gate-card{ background:white; border-radius:24px; padding:30px 22px; max-width:360px; width:100%; box-shadow: 0 20px 50px rgba(167,139,250,0.25); text-align:center; }
+  .file-drop{ border:2px dashed var(--border); border-radius: var(--radius-sm); padding:20px; text-align:center; color:var(--muted); font-size:13.5px; cursor:pointer; background:#FBFAFE; }
+  .exo-item{ background:#FBFAFE; border:1px solid var(--border); border-radius: var(--radius-sm); padding:12px 13px; margin-bottom:9px; }
+  .divider{ height:1px; background:var(--border); margin:14px 0; }
+  .toast{ position:fixed; bottom:96px; left:50%; transform:translateX(-50%); background: var(--text); color:white; padding:10px 18px; border-radius:999px; font-size:12.5px; font-weight:600; z-index:60; box-shadow:var(--shadow); max-width:88%; text-align:center; }
+  .leader-row{ display:flex; align-items:center; gap:11px; padding:10px 6px; border-bottom:1px solid var(--border); }
+  .leader-rank{ width:25px; height:25px; border-radius:50%; background:var(--lavender-soft); color:var(--lavender); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11.5px; flex-shrink:0; }
+  small.hint{ color:var(--muted); font-size:12px; display:block; margin-top:4px; }
+  label.field-label{ font-size:12px; font-weight:700; color:var(--muted); display:block; margin-bottom:5px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .flash-card{ background: linear-gradient(135deg, var(--lavender-soft), var(--mint-soft)); border-radius: var(--radius); padding:34px 20px; min-height:180px; display:flex; align-items:center; justify-content:center; text-align:center; font-weight:700; font-size:16px; margin-bottom:16px; box-shadow:var(--shadow); user-select:none; touch-action:pan-y; }
+  .flash-progress{ text-align:center; color:var(--muted); font-size:12.5px; margin-bottom:10px; font-weight:600; }
+  .streak-banner{ background: linear-gradient(135deg,var(--peach),var(--gold)); color:#5C3A1A; border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; display:flex; align-items:center; gap:12px; font-weight:700; box-shadow:var(--shadow); }
+  .pending-item{ background:#FFF8E9; border:1.5px solid var(--gold); border-radius:var(--radius-sm); padding:12px; margin-bottom:10px; }
+  .modal-overlay{ position:fixed; inset:0; background:rgba(45,42,61,0.45); display:none; align-items:flex-end; justify-content:center; z-index:100; padding:0; }
+  .modal-card{ background:white; border-radius: 22px 22px 0 0; padding:22px; max-width:520px; width:100%; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); max-height:80vh; overflow-y:auto; }
+  .avatar-mini-letter{ width:22px;height:22px;border-radius:50%; background:var(--lavender); color:white; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; }
+  .edit-field-row{ margin-bottom:10px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// Detection : sommes-nous dans l'apercu Claude (artefact) ou sur un vrai hebergement
+// avec le backend fourni ? Cela permet de tester ici, tout en utilisant le vrai backend
+// une fois deploye (voir memora-backend/README.md).
+const IN_ARTIFACT_PREVIEW = !!(window.storage && typeof window.storage.set === 'function');
+
+function getToken(){ return localStorage.getItem('memora-token') || null; }
+function getUsername(){ return localStorage.getItem('memora-username') || null; }
+function setSession(token, username, isAdmin){
+  localStorage.setItem('memora-token', token);
+  localStorage.setItem('memora-username', username);
+}
+function clearSession(){ localStorage.removeItem('memora-token'); localStorage.removeItem('memora-username'); setStoredIsAdmin(false); }
+function authHeaders(){ const t = getToken(); return t ? { 'Authorization': 'Bearer '+t } : {}; }
+
+// Le code admin, une fois validé pour un compte, est mémorisé localement pour ce compte
+// précis : plus besoin de le retaper à chaque visite. Il est effacé à la déconnexion.
+function getStoredIsAdmin(){
+  return localStorage.getItem('memora-isadmin')==='1' && localStorage.getItem('memora-isadmin-for')===getUsername();
+}
+function setStoredIsAdmin(isAdmin, username){
+  if(isAdmin){ localStorage.setItem('memora-isadmin','1'); localStorage.setItem('memora-isadmin-for', username||getUsername()||''); }
+  else{ localStorage.removeItem('memora-isadmin'); localStorage.removeItem('memora-isadmin-for'); }
+}
+
+// Safe storage : en apercu Claude on utilise window.storage (partage entre utilisateurs
+// de l'artefact). Une fois deploye avec le backend, tout passe par /api/storage, qui est
+// vraiment partage entre tous les visiteurs de ton site (contrairement a localStorage seul).
+const safeStorage = {
+  async get(key, shared, tokenOverride){
+    if(IN_ARTIFACT_PREVIEW){ try{ return await window.storage.get(key, shared); }catch(e){ return { value:null }; } }
+    try{
+      const headers = tokenOverride ? { 'Authorization': 'Bearer '+tokenOverride } : authHeaders();
+      const res = await fetch(`/api/storage?key=${encodeURIComponent(key)}&shared=${!!shared}`, { headers });
+      if(!res.ok) return { value:null };
+      return await res.json();
+    }catch(e){ return { value:null }; }
+  },
+  async set(key, val, shared, tokenOverride){
+    // IMPORTANT : renvoie maintenant true/false selon que l'écriture a vraiment réussi.
+    // Avant, une erreur ou un 401/500 côté serveur était avalée silencieusement : l'admin
+    // voyait "Notion supprimée / mise à jour" alors que rien n'avait été sauvegardé, et la
+    // notion réapparaissait au rechargement. C'était la cause du bug de suppression/édition.
+    if(IN_ARTIFACT_PREVIEW){ try{ await window.storage.set(key, val, shared); return true; }catch(e){ console.error('storage.set failed', e); return false; } }
+    try{
+      const headers = { 'Content-Type':'application/json', ...(tokenOverride ? { 'Authorization': 'Bearer '+tokenOverride } : authHeaders()) };
+      const res = await fetch('/api/storage', { method:'POST', headers, body: JSON.stringify({ key, value: val, shared: !!shared }) });
+      return res.ok;
+    }catch(e){ console.error('storage.set failed', e); return false; }
+  },
+  async delete(key, shared, tokenOverride){
+    if(IN_ARTIFACT_PREVIEW){ try{ await window.storage.delete(key, shared); return true; }catch(e){ return false; } }
+    try{
+      const headers = tokenOverride ? { 'Authorization': 'Bearer '+tokenOverride } : authHeaders();
+      const res = await fetch(`/api/storage?key=${encodeURIComponent(key)}&shared=${!!shared}`, { method:'DELETE', headers });
+      return res.ok;
+    }catch(e){ return false; }
+  },
+  async list(prefix, shared){
+    if(IN_ARTIFACT_PREVIEW){ try{ return await window.storage.list(prefix, shared); }catch(e){ return { keys:[] }; } }
+    try{
+      const res = await fetch(`/api/storage/list?prefix=${encodeURIComponent(prefix)}&shared=${!!shared}`, { headers: authHeaders() });
+      if(!res.ok) return { keys:[] };
+      return await res.json();
+    }catch(e){ return { keys:[] }; }
+  }
+};
+
+// ================= Anthropic API helpers =================
+// En apercu Claude : appel direct (gere automatiquement par le bac a sable de Claude.ai).
+// Une fois deploye avec le backend fourni : appel a /api/ask, qui garde ta cle API secrete
+// cote serveur (jamais visible dans le navigateur).
+async function askClaude(messages, opts={}){
+  const body = { model:"claude-sonnet-4-6", max_tokens: opts.maxTokens || 1000, messages };
+  if(opts.system) body.system = opts.system;
+  if(opts.tools) body.tools = opts.tools;
+  if(IN_ARTIFACT_PREVIEW){
+    const res = await fetch("https://api.anthropic.com/v1/messages", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body) });
+    const data = await res.json();
+    return (data.content||[]).map(b=>b.text||"").filter(Boolean).join("\n");
+  }
+  const res = await fetch('/api/ask', { method:'POST', headers:{ 'Content-Type':'application/json', ...authHeaders() }, body: JSON.stringify(body) });
+  const data = await res.json();
+  if(res.status===401){ clearSession(); setState({ accessGranted:false }); throw new Error("Session expirée, reconnecte-toi."); }
+  if(data.error) throw new Error(data.error);
+  return data.text || "";
+}
+async function askClaudeWithWebSearch(messages, opts={}){
+  return askClaude(messages, {...opts, tools:[{type:"web_search_20250305", name:"web_search"}], maxTokens: opts.maxTokens || 1500});
+}
+
+// ================= Auth helpers =================
+// En apercu Claude : compte simule via window.storage, uniquement pour tester l'interface ici.
+// Une fois deploye : vraies requetes au backend, mots de passe haches (bcrypt) cote serveur.
+async function apiRegister(username, password){
+  username = (username||"").trim();
+  if(IN_ARTIFACT_PREVIEW){
+    const key = 'preview-account:'+normalize(username);
+    const existing = await getJSON(key, true);
+    if(existing) return { error: "Ce nom d'utilisateur existe déjà." };
+    await setJSON(key, { password, isAdmin:false }, true);
+    return { token:'preview.'+normalize(username), username, isAdmin:false };
+  }
+  const res = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password }) });
+  return await res.json();
+}
+async function apiLogin(username, password){
+  username = (username||"").trim();
+  if(IN_ARTIFACT_PREVIEW){
+    const key = 'preview-account:'+normalize(username);
+    const account = await getJSON(key, true);
+    if(!account || account.password !== password) return { error: "Identifiants incorrects." };
+    return { token:'preview.'+normalize(username), username, isAdmin: !!account.isAdmin };
+  }
+  const res = await fetch('/api/auth/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password }) });
+  return await res.json();
+}
+async function apiAdminCheck(code){
+  if(IN_ARTIFACT_PREVIEW){
+    // Test uniquement : dans l'apercu on ne connaît pas ton vrai code secret cote serveur,
+    // donc n'importe quel code non vide passe ici pour te laisser voir l'onglet Admin.
+    return { isAdmin: !!code };
+  }
+  const res = await fetch('/api/auth/admin-check', { method:'POST', headers:{'Content-Type':'application/json', ...authHeaders()}, body: JSON.stringify({ code }) });
+  return await res.json();
+}
+
+function parseJsonLoose(text){
+  const cleaned = text.replace(/```json|```/g,"").trim();
+  const start = cleaned.indexOf("{"); const end = cleaned.lastIndexOf("}");
+  let candidate = cleaned;
+  if(start !== -1 && end !== -1) candidate = cleaned.slice(start, end+1);
+  try{ return JSON.parse(candidate); }catch(e){ return null; }
+}
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const r = new FileReader();
+    r.onload = ()=> resolve(r.result.split(",")[1]);
+    r.onerror = ()=> reject(new Error("Lecture du fichier impossible"));
+    r.readAsDataURL(file);
+  });
+}
+function normalize(str){ return (str||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+
+// ================= Compte admin de secours (bootstrap) =================
+// CHANGE CES DEUX VALEURS avant de mettre le site en ligne. Ce compte donne un accès admin
+// total dès la connexion (sans code de validation), quel que soit l'état du backend — c'est
+// la solution de secours pour ne jamais rester bloqué dehors.
+const MASTER_ADMIN_USERNAME = "jos@";
+const MASTER_ADMIN_PASSWORD = "joswilk@1868";
+function isMasterAdmin(){ return normalize(state.userName)===normalize(MASTER_ADMIN_USERNAME); }
+// Code que les utilisateurs normaux entrent dans l'onglet Admin pour devenir admin.
+// Le compte de secours ci-dessus peut le consulter/changer et retirer l'accès à qui il veut.
+async function checkAdminCode(code){
+  if(!code) return false;
+  const stored = await getJSON('admin-code', true);
+  const validCode = (stored && stored.code) ? stored.code : "2545"; // code par défaut tant qu'il n'a pas été personnalisé
+  return code === validCode;
+}
+async function resolveIsAdmin(username){
+  if(!username) return false;
+  if(normalize(username)===normalize(MASTER_ADMIN_USERNAME)) return true;
+  const list = await getJSON('admin-usernames', true);
+  if(list && list.includes(normalize(username))) return true;
+  return getStoredIsAdmin(); // repli hors-ligne si le stockage partagé est injoignable
+}
+// ================= Bannissement & registre des comptes =================
+async function isBanned(username){
+  if(normalize(username)===normalize(MASTER_ADMIN_USERNAME)) return false;
+  const list = (await getJSON('banned-usernames', true)) || [];
+  return list.includes(normalize(username));
+}
+async function trackUserSighting(username, tokenOverride){
+  // IMPORTANT : appelée depuis doLogin/doRegister AVANT que la session soit ouverte
+  // (setSession n'a pas encore tourné), donc localStorage ne contient pas encore de token.
+  // Sans tokenOverride, authHeaders() renvoyait un objet vide, le serveur répondait 401,
+  // et l'écriture échouait en silence : c'était la cause du bug "aucun compte enregistré"
+  // dans l'onglet Admin alors que des élèves étaient bel et bien inscrits.
+  const norm = normalize(username);
+  if(!norm || norm===normalize(MASTER_ADMIN_USERNAME)) return;
+  const list = (await getJSON('all-users', true, tokenOverride)) || [];
+  if(!list.find(u=>u.norm===norm)){
+    list.push({ norm, username, firstSeen: Date.now() });
+    const ok = await setJSON('all-users', list, true, tokenOverride);
+    if(!ok) console.error('trackUserSighting: échec de l\'écriture (token manquant ou invalide)');
+  }
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+function isScientific(category){
+  const c = normalize(category||"");
+  return ["math","physi","chimi","science"].some(k=>c.includes(k));
+}
+function scientificInstruction(category){
+  if(!isScientific(category)) return "";
+  return " Comme il s'agit de mathématiques, physique ou chimie, détaille rigoureusement chaque étape du raisonnement (formules utilisées, calculs intermédiaires, unités) dans les explications et corrections.";
+}
+
+// ================= State =================
+let state = {
+  accessGranted:false, userName:null,
+  screen:"recherche", notionsIndex:[], currentNotion:null,
+  points:0, isAdmin:false, loading:false, toastMsg:null,
+  streak:{count:0}, missed:[],
+};
+
+function setState(patch){ state = {...state, ...patch}; render(); }
+function showToast(msg){ setState({toastMsg: msg}); setTimeout(()=>{ if(state.toastMsg===msg) setState({toastMsg:null}); }, 2400); }
+function renderInPlace(){ const m=document.getElementById('main'); if(m){ m.innerHTML = renderScreen(); bindScreen(); typesetMath(m); } }
+function escapeHtml(s){ const d=document.createElement('div'); d.innerText = s==null?"":String(s); return d.innerHTML; }
+
+// ================= Rendu texte riche (markdown léger + maths KaTeX) =================
+// Avant : le texte de l'IA (fiches, notions, recherches web, explications) s'affichait en
+// texte brut (LaTeX illisible du type "\frac{1}{x}", "**gras**" tel quel, etc). Ici on
+// échappe le HTML (sécurité), on convertit un markdown minimal en vraies balises, puis on
+// laisse KaTeX transformer les $...$ / $$...$$ en formules lisibles une fois inséré au DOM.
+function mdToHtml(escaped){
+  let html = escaped;
+  html = html.replace(/^#{3} (.*)$/gm, '<h4 style="margin:14px 0 6px; font-size:15px;">$1</h4>');
+  html = html.replace(/^#{2} (.*)$/gm, '<h3 style="margin:16px 0 8px; font-size:16.5px;">$1</h3>');
+  html = html.replace(/^# (.*)$/gm, '<h2 style="margin:16px 0 8px; font-size:18px;">$1</h2>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+  html = html.replace(/(^|\n)((?:[-•] .*(?:\n|$))+)/g, (m, pre, block)=>{
+    const items = block.trim().split('\n').map(l=> `<li>${l.replace(/^[-•]\s+/,'')}</li>`).join('');
+    return pre + `<ul style="margin:6px 0 10px; padding-left:20px;">${items}</ul>`;
+  });
+  html = html.replace(/(^|\n)((?:\d+\. .*(?:\n|$))+)/g, (m, pre, block)=>{
+    const items = block.trim().split('\n').map(l=> `<li>${l.replace(/^\d+\.\s+/,'')}</li>`).join('');
+    return pre + `<ol style="margin:6px 0 10px; padding-left:20px;">${items}</ol>`;
+  });
+  html = html.split(/\n{2,}/).map(block=>{
+    if(/^\s*<(h2|h3|h4|ul|ol)/.test(block)) return block;
+    return block.trim() ? `<p style="margin:0 0 10px;">${block.replace(/\n/g,'<br>')}</p>` : '';
+  }).join('');
+  return html;
+}
+function renderRich(text){ return mdToHtml(escapeHtml(text||"")); }
+// A appeler juste après avoir injecté du HTML issu de renderRich() dans le DOM, pour
+// transformer les $...$ / $$...$$ en formules mathématiques propres.
+function typesetMath(container){
+  if(!container || typeof renderMathInElement !== 'function') return;
+  try{
+    renderMathInElement(container, {
+      delimiters: [
+        {left:'$$', right:'$$', display:true},
+        {left:'$', right:'$', display:false},
+        {left:'\\(', right:'\\)', display:false},
+        {left:'\\[', right:'\\]', display:true}
+      ],
+      throwOnError:false
+    });
+  }catch(e){ console.error('Erreur de rendu KaTeX', e); }
+}
+
+// ================= Modal =================
+function ensureModalOverlay(){
+  let overlay = document.getElementById('app-modal-overlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'app-modal-overlay';
+    overlay.className = 'modal-overlay';
+    document.body.appendChild(overlay);
+  }
+  return overlay;
+}
+function openModal(innerHtml){
+  const overlay = ensureModalOverlay();
+  overlay.innerHTML = `<div class="modal-card">${innerHtml}</div>`;
+  overlay.style.display = 'flex';
+  overlay.onclick = (e)=>{ if(e.target===overlay) closeModal(); };
+}
+function closeModal(){ const overlay = document.getElementById('app-modal-overlay'); if(overlay) overlay.style.display='none'; }
+function showConfirmModal(message, onConfirm){
+  openModal(`
+    <p style="margin-bottom:16px; font-size:14.5px;">${escapeHtml(message)}</p>
+    <div class="row"><button class="btn btn-outline btn-block" id="modal-cancel">Annuler</button><button class="btn btn-danger btn-block" id="modal-confirm">Confirmer</button></div>`);
+  document.getElementById('modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('modal-confirm').addEventListener('click', ()=>{ closeModal(); onConfirm(); });
+}
+function showPromptModal(label, defaultValue, onSubmit){
+  openModal(`
+    <label class="field-label">${escapeHtml(label)}</label>
+    <input type="text" id="modal-input" value="${escapeHtml(defaultValue||'')}" style="margin-bottom:14px;">
+    <div class="row"><button class="btn btn-outline btn-block" id="modal-cancel">Annuler</button><button class="btn btn-primary btn-block" id="modal-submit">Valider</button></div>`);
+  const input = document.getElementById('modal-input');
+  const submit = ()=>{ const v = input.value; closeModal(); onSubmit(v); };
+  document.getElementById('modal-cancel').addEventListener('click', closeModal);
+  document.getElementById('modal-submit').addEventListener('click', submit);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+  input.focus();
+}
+
+// ================= Storage helpers =================
+async function getJSON(key, shared, tokenOverride){ try{ const r = await safeStorage.get(key, shared, tokenOverride); return r && r.value ? JSON.parse(r.value) : null; }catch(e){ return null; } }
+async function setJSON(key, value, shared, tokenOverride){ try{ return await safeStorage.set(key, JSON.stringify(value), shared, tokenOverride); }catch(e){ console.error(e); return false; } }
+async function deleteJSON(key, shared, tokenOverride){
+  const ok = await safeStorage.delete(key, shared, tokenOverride).catch(()=>false);
+  if(ok) return true;
+  // Repli : si l'endpoint de suppression n'existe pas encore côté serveur, on écrase
+  // la valeur par null plutôt que de laisser l'ancienne donnée "fantôme" en place.
+  return await setJSON(key, null, shared, tokenOverride);
+}
+
+async function loadIndex(){ const idx = await getJSON('notions-index', true); setState({ notionsIndex: idx || [] }); }
+async function loadPoints(){
+  if(!state.userName) return;
+  const p = await getJSON('score:'+normalize(state.userName), true);
+  const streak = await getJSON('user-streak', false);
+  const missed = await getJSON('user-missed', false);
+  setState({
+    points: p && p.points ? p.points : 0,
+    streak: streak || {count:0},
+    missed: missed || [],
+  });
+}
+async function addPoints(n){
+  const key = 'score:'+normalize(state.userName);
+  const current = await getJSON(key, true);
+  const total = (current && current.points ? current.points : 0) + n;
+  await setJSON(key, { name: state.userName, points: total }, true);
+  setState({ points: total });
+}
+async function addMissed(items){
+  if(!items.length) return;
+  let missed = (await getJSON('user-missed', false)) || [];
+  missed = [...items, ...missed].slice(0,50);
+  await setJSON('user-missed', missed, false);
+  setState({ missed });
+}
+async function updateStreak(){
+  let s = (await getJSON('user-streak', false)) || {count:0, lastDate:null};
+  const today = new Date().toISOString().slice(0,10);
+  if(s.lastDate === today){}
+  else{
+    const y = new Date(Date.now()-86400000).toISOString().slice(0,10);
+    s.count = (s.lastDate === y) ? (s.count||0)+1 : 1;
+    s.lastDate = today;
+    await setJSON('user-streak', s, false);
+  }
+  setState({ streak: s });
+}
+
+// ================= Init =================
+async function init(){
+  const token = getToken(), username = getUsername();
+  if(token && username){
+    if(await isBanned(username)){
+      clearSession();
+    }else{
+      state.accessGranted = true; state.userName = username;
+      state.isAdmin = await resolveIsAdmin(username);
+    }
+  }
+  await loadIndex();
+  if(state.userName){ await loadPoints(); await updateStreak(); }
+  render();
+}
+async function doLogin(username, password){
+  if(normalize(username)===normalize(MASTER_ADMIN_USERNAME) && password===MASTER_ADMIN_PASSWORD){
+    // Le compte de secours doit quand même obtenir un vrai token signé par le serveur (via
+    // /api/auth/login, en créant le compte au passage s'il n'existe pas encore) : un token
+    // "maison" comme avant ('master-admin-session') est rejeté par le serveur sur chaque appel
+    // protégé (IA, upload, stockage), ce qui te déconnectait dès que tu envoyais un message.
+    let r = await apiLogin(MASTER_ADMIN_USERNAME, MASTER_ADMIN_PASSWORD);
+    if(r.error) r = await apiRegister(MASTER_ADMIN_USERNAME, MASTER_ADMIN_PASSWORD);
+    if(r.error){ showAuthError("Impossible d'ouvrir la session admin : " + r.error); return; }
+    await grantSession({ token: r.token, username: MASTER_ADMIN_USERNAME, isAdmin: true });
+    return;
+  }
+  if(await isBanned(username)){ showAuthError("Ce compte a été suspendu par l'admin."); return; }
+  const r = await apiLogin(username, password);
+  if(r.error){ showAuthError(r.error); return; }
+  await trackUserSighting(r.username, r.token);
+  // Les comptes déjà marqués admin côté serveur entrent directement (sinon personne ne
+  // pourrait jamais lire le tout premier code de validation dans l'onglet Admin).
+  if(r.isAdmin){ await grantSession(r); return; }
+  await requestValidationCode(r);
+}
+async function doRegister(username, password){
+  if(!username || !username.trim() || !password || password.length < 6){ showAuthError("Prénom requis, mot de passe d'au moins 6 caractères."); return; }
+  if(normalize(username)===normalize(MASTER_ADMIN_USERNAME)){ showAuthError("Cet identifiant est réservé."); return; }
+  if(await isBanned(username)){ showAuthError("Cet identifiant a été banni."); return; }
+  const r = await apiRegister(username, password);
+  if(r.error){ showAuthError(r.error); return; }
+  await trackUserSighting(r.username, r.token);
+  if(r.isAdmin){ await grantSession(r); return; }
+  await requestValidationCode(r);
+}
+async function grantSession(r){
+  setSession(r.token, r.username, r.isAdmin);
+  const admin = await resolveIsAdmin(r.username) || !!r.isAdmin;
+  setStoredIsAdmin(admin, r.username);
+  setState({ accessGranted:true, userName:r.username, isAdmin: admin });
+  loadPoints(); updateStreak();
+}
+// ================= Code de validation à la connexion =================
+// À chaque tentative de connexion (ou création de compte) d'un compte non-admin, un code
+// à 6 chiffres est généré et déposé dans le stockage partagé sous "login-code:<pseudo>",
+// visible par l'admin dans l'onglet Admin. L'élève doit saisir ce code pour finaliser sa
+// connexion. Un nouveau code écrase l'ancien à chaque tentative.
+let pendingAuth = null;
+async function requestValidationCode(authResult){
+  const code = String(Math.floor(100000 + Math.random()*900000));
+  const key = 'login-code:'+normalize(authResult.username);
+  // authResult.token vient d'être délivré par /api/auth/login ou /register : on l'utilise
+  // directement (au lieu de authHeaders(), qui lit localStorage — vide tant que la session
+  // n'est pas encore accordée). Sans ça, cette écriture échouait en silence (401) et l'admin
+  // ne voyait jamais aucun code apparaître.
+  const ok = await setJSON(key, { username: authResult.username, code, createdAt: Date.now() }, true, authResult.token);
+  if(!ok){ showToast("Impossible de générer le code, réessaie."); }
+  pendingAuth = authResult;
+  render();
+}
+async function submitValidationCode(){
+  const input = document.getElementById('auth-valcode');
+  const entered = (input ? input.value.trim() : "");
+  if(!entered){ showAuthError("Entre le code fourni par l'admin."); return; }
+  if(!pendingAuth) return;
+  if(await isBanned(pendingAuth.username)){ pendingAuth = null; showToast("Ce compte a été suspendu par l'admin."); render(); return; }
+  const key = 'login-code:'+normalize(pendingAuth.username);
+  const record = await getJSON(key, true, pendingAuth.token);
+  if(!record || record.code !== entered){ showAuthError("Code incorrect."); return; }
+  const r = pendingAuth; pendingAuth = null;
+  await deleteJSON(key, true, r.token); // le code ne sert qu'une fois
+  await grantSession(r);
+}
+function cancelValidationCode(){ pendingAuth = null; render(); }
+function showAuthError(msg){ const err = document.getElementById('auth-error'); if(err){ err.textContent = msg; err.style.display='block'; } }
+function doLogout(){ clearSession(); setState({ accessGranted:false, userName:null, isAdmin:false, points:0 }); }
+async function saveName(name){
+  name = (name||"").trim(); if(!name) return;
+  setState({ userName:name });
+  await loadPoints(); await updateStreak();
+}
+
+// ================= Root render =================
+function applyTheme(){
+  document.body.classList.toggle('dark', getStoredTheme()==='dark');
+}
+function getStoredTheme(){ return localStorage.getItem('memora-theme') || 'light'; }
+function setStoredTheme(theme){ localStorage.setItem('memora-theme', theme); applyTheme(); }
+function render(){
+  applyTheme();
+  const app = document.getElementById('app');
+  if(!app) return;
+  if(!state.accessGranted){ app.innerHTML = renderAuthGate(); bindAuthGate(); return; }
+  app.innerHTML = `
+    ${renderHeader()}
+    <main id="main">${renderScreen()}</main>
+    ${renderTabbar()}
+    ${state.toastMsg ? `<div class="toast">${escapeHtml(state.toastMsg)}</div>` : ""}
+  `;
+  bindScreen();
+  typesetMath(app);
+}
+
+// ================= Auth gate (compte) =================
+let authTab = 'login';
+function renderAuthGate(){
+  if(pendingAuth){
+    return `<div class="name-gate"><div class="name-gate-card">
+      <div class="logo-mark" style="margin:0 auto 14px;">M</div>
+      <h2 style="font-size:21px;margin-bottom:6px;">Code de validation</h2>
+      <p style="color:var(--muted); font-size:13.5px; margin-bottom:16px;">Un code a été généré pour <strong>${escapeHtml(pendingAuth.username)}</strong> et transmis à l'admin. Demande-le lui puis entre-le ici.</p>
+      <input type="text" inputmode="numeric" id="auth-valcode" placeholder="Code à 6 chiffres" style="margin-bottom:8px; text-align:center; letter-spacing:4px; font-weight:700; font-size:18px;">
+      <div id="auth-error" style="display:none; color:var(--danger); font-size:12.5px; font-weight:600; margin-bottom:10px;"></div>
+      <button class="btn btn-primary btn-block" id="auth-validate-code">Valider</button>
+      <button class="btn btn-outline btn-block" id="auth-cancel-code" style="margin-top:8px;">Annuler</button>
+    </div></div>`;
+  }
+  return `<div class="name-gate"><div class="name-gate-card">
+    <div class="logo-mark" style="margin:0 auto 14px;">M</div>
+    <h2 style="font-size:23px;margin-bottom:6px;">Memora</h2>
+    <p style="color:var(--muted); font-size:13.5px; margin-bottom:16px;">${authTab==='login' ? 'Connecte-toi à ton compte.' : 'Crée ton compte pour commencer.'}</p>
+    <div class="row" style="margin-bottom:14px;">
+      <button class="btn ${authTab==='login'?'btn-primary':'btn-outline'} btn-block" id="auth-tab-login">Se connecter</button>
+      <button class="btn ${authTab==='register'?'btn-primary':'btn-outline'} btn-block" id="auth-tab-register">Créer un compte</button>
+    </div>
+    <input type="text" id="auth-username" placeholder="Prénom / identifiant" style="margin-bottom:8px;">
+    <input type="password" id="auth-password" placeholder="Mot de passe" style="margin-bottom:8px;">
+    <div id="auth-error" style="display:none; color:var(--danger); font-size:12.5px; font-weight:600; margin-bottom:10px;"></div>
+    <button class="btn btn-primary btn-block" id="auth-submit">${authTab==='login' ? 'Se connecter' : 'Créer mon compte'}</button>
+  </div></div>`;
+}
+function bindAuthGate(){
+  if(pendingAuth){
+    const vBtn = document.getElementById('auth-validate-code');
+    const cBtn = document.getElementById('auth-cancel-code');
+    const input = document.getElementById('auth-valcode');
+    if(vBtn) vBtn.addEventListener('click', submitValidationCode);
+    if(cBtn) cBtn.addEventListener('click', cancelValidationCode);
+    if(input){ input.addEventListener('keydown', e=>{ if(e.key==='Enter') submitValidationCode(); }); input.focus(); }
+    return;
+  }
+  const setTab = (tab)=>{ authTab = tab; render(); };
+  const loginTab = document.getElementById('auth-tab-login'), registerTab = document.getElementById('auth-tab-register');
+  if(loginTab) loginTab.addEventListener('click', ()=> setTab('login'));
+  if(registerTab) registerTab.addEventListener('click', ()=> setTab('register'));
+  const submit = ()=>{
+    const u = document.getElementById('auth-username').value;
+    const p = document.getElementById('auth-password').value;
+    if(authTab==='login') doLogin(u,p); else doRegister(u,p);
+  };
+  const btn = document.getElementById('auth-submit');
+  if(btn){
+    btn.addEventListener('click', submit);
+    document.getElementById('auth-password').addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+  }
+}
+
+// ================= Header =================
+function renderHeader(){
+  return `<div class="header">
+    <div class="logo-row">
+      <div class="logo-mark">M</div>
+      <div class="brand">Memora</div>
+    </div>
+    <button class="user-chip" id="user-chip">
+      <span class="avatar-mini-letter">${escapeHtml((state.userName||'?').charAt(0).toUpperCase())}</span>
+      ${escapeHtml(state.userName)}
+      <span class="points-badge">${state.points}pts</span>
+    </button>
+  </div>`;
+}
+
+// ================= Tabbar =================
+const TAB_ICONS = {
+  recherche: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.2" y2="16.2"></line></svg>`,
+  lecons: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
+  flashcards: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="13" height="15" rx="2" transform="rotate(-6 10.5 13.5)"></rect><rect x="7" y="3" width="13" height="15" rx="2"></rect></svg>`,
+  fiches: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"></path><path d="M14 3v5h5"></path><line x1="8" y1="13" x2="15" y2="13"></line><line x1="8" y1="17" x2="13" y2="17"></line></svg>`,
+  classement: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"></path><path d="M12 17v4"></path><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"></path><path d="M7 6H4a3 3 0 0 0 3 5"></path><path d="M17 6h3a3 3 0 0 1-3 5"></path></svg>`,
+  chat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a7.5 7.5 0 0 1-11.2 6.5L4 19l1.2-4.3A7.5 7.5 0 1 1 21 11.5z"></path></svg>`,
+  entrainement: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2h6l2 2h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"></path><circle cx="12" cy="14" r="3.4"></circle></svg>`,
+  admin: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4a2 2 0 0 1 2 0l.6 1.7a7 7 0 0 1 1.9 1.1l1.8-.4a2 2 0 0 1 1.7 1l.1.1a2 2 0 0 1-.2 2l-1.1 1.5a7 7 0 0 1 0 2.2l1.1 1.5a2 2 0 0 1 .2 2l-.1.1a2 2 0 0 1-1.7 1l-1.8-.4a7 7 0 0 1-1.9 1.1L13 20a2 2 0 0 1-2 0l-.6-1.7a7 7 0 0 1-1.9-1.1l-1.8.4a2 2 0 0 1-1.7-1l-.1-.1a2 2 0 0 1 .2-2l1.1-1.5a7 7 0 0 1 0-2.2L5.1 9.3a2 2 0 0 1-.2-2l.1-.1a2 2 0 0 1 1.7-1l1.8.4a7 7 0 0 1 1.9-1.1L11 4z"></path><circle cx="12" cy="12" r="2.6"></circle></svg>`,
+};
+const TABS = [
+  {id:'recherche', label:'Rechercher'},
+  {id:'lecons', label:'Leçons'},
+  {id:'flashcards', label:'Flashcards'},
+  {id:'fiches', label:'Fiches'},
+  {id:'classement', label:'Classement'},
+  {id:'chat', label:'Chat'},
+  {id:'entrainement', label:'Perso photo'},
+  {id:'admin', label:'Admin'},
+];
+function renderTabbar(){
+  return `<nav class="tabbar">${TABS.map(t=>`
+    <button class="tab-circle ${state.screen===t.id?'active':''}" data-tab="${t.id}" title="${t.label}" aria-label="${t.label}">
+      ${TAB_ICONS[t.id]}
+    </button>`).join("")}</nav>`;
+}
+
+// ================= Screen router =================
+function renderScreen(){
+  if(state.currentNotion) return renderNotionDetail();
+  switch(state.screen){
+    case 'recherche': return renderRecherche();
+    case 'lecons': return renderLecons();
+    case 'flashcards': return renderFlashcardsHub();
+    case 'fiches': return renderFiches();
+    case 'classement': return renderClassement();
+    case 'chat': return renderChat();
+    case 'entrainement': return renderPerso();
+    case 'admin': return renderAdmin();
+    default: return renderRecherche();
+  }
+}
+function bindScreen(){
+  const chip = document.getElementById('user-chip');
+  if(chip) chip.addEventListener('click', ()=>{
+    showConfirmModal("Se déconnecter de Memora ?", ()=> doLogout());
+  });
+  document.querySelectorAll('.tab-circle').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      stopChatPolling();
+      setState({ screen: b.dataset.tab, currentNotion:null });
+      if(b.dataset.tab === 'chat') startChatAfterRender();
+    });
+  });
+  if(state.currentNotion){ bindNotionDetail(); return; }
+  switch(state.screen){
+    case 'recherche': bindRecherche(); break;
+    case 'lecons': bindLecons(); break;
+    case 'flashcards': bindFlashcardsHub(); break;
+    case 'fiches': bindFiches(); break;
+    case 'classement': bindClassement(); break;
+    case 'chat': bindChat(); startChatAfterRender(); break;
+    case 'entrainement': bindPerso(); break;
+    case 'admin': bindAdmin(); break;
+  }
+}
+
+// =================== RECHERCHE ===================
+// Avant : la recherche affichait en permanence la liste de toutes les notions (des vignettes)
+// sous la barre. Maintenant : rien ne s'affiche tant qu'on ne tape rien (la liste complète vit
+// désormais dans l'onglet "Leçons"). Un seul résultat s'ouvre directement, plusieurs résultats
+// affichent de simples liens à choisir.
+let searchQuery = "";
+function renderRecherche(){
+  return `
+  ${state.streak.count>1 ? `<div class="streak-banner">🔥 <div>${state.streak.count} jours d'entraînement d'affilée, continue comme ça !</div></div>` : ""}
+  <div class="section-title">Rechercher une notion</div>
+  <div class="section-sub">Tape le nom d'une leçon, une matière, une classe ou un mot-clé — le contenu s'affiche directement.</div>
+  <input type="text" id="search-input" placeholder="Ex : les fractions, le passé composé..." value="${escapeHtml(searchQuery)}" style="margin-bottom:16px;" autofocus>
+  <div id="search-results">${renderSearchResults()}</div>`;
+}
+function renderSearchResults(){
+  if(!searchQuery.trim()) return `<div id="web-propose-zone"></div>`;
+  const q = normalize(searchQuery);
+  const filtered = state.notionsIndex.filter(n=>
+    normalize(n.title).includes(q) || normalize(n.category).includes(q) || normalize(n.classe||"").includes(q) || normalize(n.tags||"").includes(q)
+  );
+  if(filtered.length===0){
+    return `<div class="empty">
+      <div class="empty-emoji">🗂️</div>
+      Aucun résultat pour cette recherche.
+      <div style="margin-top:14px;"><button class="btn btn-peach" id="web-search-btn">🌐 Chercher sur internet et proposer</button></div>
+    </div><div id="web-propose-zone"></div>`;
+  }
+  if(filtered.length===1){
+    // Résultat unique : on ne montre pas de liste, la notion s'affiche directement.
+    setTimeout(()=> openNotion(filtered[0].id), 0);
+    return `<div class="empty" style="padding:14px;"><span class="spinner spinner-dark"></span></div>`;
+  }
+  return `<div class="section-sub" style="margin-bottom:8px;">${filtered.length} résultats — choisis une leçon :</div>
+  ${filtered.map(n=>`<button class="option-btn" data-id="${n.id}">${escapeHtml(n.title)} <span style="color:var(--muted); font-weight:400;">— ${n.classe ? escapeHtml(n.classe)+' · ' : ''}${escapeHtml(n.category)}</span></button>`).join("")}
+  <div id="web-propose-zone"></div>`;
+}
+function bindRecherche(){
+  const input = document.getElementById('search-input');
+  if(input){
+    input.addEventListener('input', (e)=>{
+      searchQuery = e.target.value;
+      const zone = document.getElementById('search-results');
+      if(zone){
+        zone.innerHTML = renderSearchResults();
+        bindSearchResults();
+      }
+    });
+  }
+  bindSearchResults();
+}
+function bindSearchResults(){
+  document.querySelectorAll('.notion-item[data-id], .option-btn[data-id]').forEach(el=> el.addEventListener('click', ()=> openNotion(el.dataset.id)));
+  const wsb = document.getElementById('web-search-btn');
+  if(wsb) wsb.addEventListener('click', proposeFromWeb);
+}
+
+// =================== LEÇONS (liste complète) ===================
+// Nouvel onglet demandé : toutes les leçons ajoutées, classées par matière (avec la classe
+// indiquée si elle est renseignée). C'est ici que vit désormais la liste qui s'affichait
+// auparavant sous la barre de recherche.
+function renderLecons(){
+  if(!state.notionsIndex.length){
+    return `<div class="section-title">Leçons</div><div class="empty"><div class="empty-emoji">🗂️</div>Aucune leçon n'a encore été ajoutée à la base.</div>`;
+  }
+  const byCategory = {};
+  state.notionsIndex.forEach(n=>{ const cat = n.category || "Général"; (byCategory[cat] = byCategory[cat]||[]).push(n); });
+  const cats = Object.keys(byCategory).sort();
+  return `
+  <div class="section-title">Leçons</div>
+  <div class="section-sub">Toutes les leçons de la base, classées par matière (${state.notionsIndex.length} au total).</div>
+  ${cats.map(cat=>`
+    <h3 style="margin:14px 0 8px; font-size:14.5px;">${escapeHtml(cat)}</h3>
+    ${byCategory[cat].sort((a,b)=>(a.title||"").localeCompare(b.title||"")).map(n=>`
+      <div class="notion-item" data-id="${n.id}">
+        <div class="notion-title">${escapeHtml(n.title)}</div>
+        <div class="notion-cat">${n.classe ? escapeHtml(n.classe) : ''}</div>
+        <div class="notion-meta"><small class="hint" style="margin:0;">${n.exerciseCount||0} exercice(s)</small></div>
+      </div>`).join("")}
+  `).join("")}`;
+}
+function bindLecons(){
+  document.querySelectorAll('.notion-item[data-id]').forEach(el=> el.addEventListener('click', ()=> openNotion(el.dataset.id)));
+}
+async function openNotion(id){
+  setState({ loading:true });
+  const notion = await getJSON('notion:'+id, true);
+  setState({ currentNotion: notion, loading:false, quiz:null, quizAnswers:{}, quizSubmitted:false, exoResult:{} });
+}
+async function proposeFromWeb(){
+  const zone = document.getElementById('web-propose-zone');
+  if(!zone) return;
+  zone.innerHTML = `<div class="empty"><span class="spinner spinner-dark"></span><br>Recherche sur internet...</div>`;
+  try{
+    const text = await askClaudeWithWebSearch([{ role:"user", content:`Fais une recherche sur internet sur ce sujet scolaire : "${searchQuery}". Rédige ensuite un contenu de cours clair et structuré en français sur ce sujet, comme une fiche pédagogique. Réponds uniquement avec ce contenu, sans lien ni note.` }]);
+    if(!text){ zone.innerHTML = `<div class="empty">Rien trouvé, réessaie avec d'autres mots.</div>`; return; }
+    zone.innerHTML = `
+    <div class="card">
+      <div class="tag tag-mint">Trouvé sur internet</div>
+      <div style="font-size:13.5px; line-height:1.6;">${renderRich(text)}</div>
+    </div>
+    <button class="btn btn-primary btn-block" id="propose-admin-btn">Proposer à l'admin d'ajouter cette notion</button>`;
+    typesetMath(zone);
+    const btn = document.getElementById('propose-admin-btn');
+    if(btn) btn.addEventListener('click', async ()=>{
+      let pending = (await getJSON('pending-notions', true)) || [];
+      pending.push({ id: uid(), title: searchQuery, classe:"", category:"À catégoriser", content: text, tags:"", proposedBy: state.userName, createdAt: Date.now() });
+      await setJSON('pending-notions', pending, true);
+      showToast("Proposition envoyée à l'admin !");
+      zone.innerHTML = "";
+    });
+  }catch(e){ console.error(e); zone.innerHTML = `<div class="empty">Erreur pendant la recherche.</div>`; }
+}
+
+// =================== NOTION DETAIL ===================
+function renderNotionDetail(){
+  const n = state.currentNotion; if(!n) return "";
+  return `
+  <button class="btn btn-outline" id="back-btn" style="margin-bottom:14px;">← Retour</button>
+  <div>${(n.tags||"").split(",").filter(Boolean).map(t=>`<span class="tag tag-lav">${escapeHtml(t.trim())}</span>`).join("")}</div>
+  ${n.classe ? `<span class="tag tag-mint">${escapeHtml(n.classe)}</span>` : ""}
+  <span class="tag">${escapeHtml(n.category)}</span>
+  <div class="section-title">${escapeHtml(n.title)}</div>
+  <div class="card"><div style="font-size:14px; line-height:1.6;">${renderRich(n.content)}</div></div>
+  ${(n.linkedTo && n.linkedTo.length) ? `<div class="card"><h3 style="margin-bottom:8px; font-size:14px;">🔗 Notions liées</h3>${n.linkedTo.map(l=>`<div class="notion-item" data-id="${l.id}">${escapeHtml(l.title)}</div>`).join("")}</div>` : ""}
+  <label class="field-label">Difficulté du quiz</label>
+  <select id="quiz-difficulty" style="margin-bottom:10px;">
+    <option value="facile">Facile</option>
+    <option value="moyen" selected>Moyen</option>
+    <option value="difficile">Difficile</option>
+  </select>
+  <button class="btn btn-primary btn-block" id="gen-quiz-notion" ${state.loading?'disabled':''}>
+    ${state.loading==='quiz' ? '<span class="spinner"></span> Génération...' : '✨ Générer un quiz sur cette notion'}
+  </button>
+  <div id="quiz-zone" style="margin-top:16px;">${state.quiz ? renderQuizBlock(state.quiz, null, state.quizIsOfficial) : ""}</div>
+  <div class="divider"></div>
+  <h3 style="margin-bottom:10px;">Exercices liés</h3>
+  ${(n.exercises||[]).length===0 ? `<div class="empty" style="padding:14px;"><small class="hint">Aucun exercice ajouté pour cette notion.</small></div>` : n.exercises.map((ex,i)=>renderExercise(ex,i)).join("")}
+  `;
+}
+function renderExercise(ex, i){
+  const answered = state.exoResult && state.exoResult[i];
+  return `<div class="exo-item">
+    <div style="font-size:13.5px; margin-bottom:8px;">${escapeHtml(ex.text)}</div>
+    ${answered ? `<div style="font-size:13px; padding:10px; border-radius:10px; background:${answered.correct?'#E4F7ED':'#FBEAEB'}; margin-bottom:8px;"><strong>${answered.correct? '✅ Correct' : '❌ À revoir'}</strong><br>${renderRich(answered.feedback)}</div>` : `
+      <textarea id="exo-answer-${i}" placeholder="Écris ta réponse ici..." style="margin-bottom:8px;"></textarea>
+      <button class="btn btn-mint btn-block" data-correct-exo="${i}" ${state.loading===('exo'+i)?'disabled':''}>${state.loading===('exo'+i) ? '<span class="spinner"></span>' : 'Corriger ma réponse'}</button>`}
+    <button class="btn btn-outline" data-quiz-exo="${i}" style="margin-top:8px; width:100%;" ${state.loading===('qexo'+i)?'disabled':''}>${state.loading===('qexo'+i) ? '<span class="spinner spinner-dark"></span>' : '📝 QCM sur cet exercice'}</button>
+    <div id="exo-quiz-zone-${i}" style="margin-top:10px;"></div>
+  </div>`;
+}
+function renderQuizBlock(quiz, targetId, official){
+  const wrongItems = state.quizSubmitted ? quiz.questions.map((q,qi)=>({q,qi})).filter(({q,qi})=> state.quizAnswers[qi]!==q.correct) : [];
+  return `<div class="card" style="margin-top:14px;">
+    <h3 style="margin-bottom:12px;">Quiz</h3>
+    ${quiz.questions.map((q,qi)=>`
+      <div style="margin-bottom:18px;">
+        <div style="font-weight:600; margin-bottom:8px; font-size:14px;">${qi+1}. ${escapeHtml(q.question)}</div>
+        ${q.options.map((opt,oi)=>{
+          let cls = "option-btn";
+          if(state.quizSubmitted){ if(oi===q.correct) cls += " correct"; else if(state.quizAnswers[qi]===oi) cls += " wrong"; }
+          else if(state.quizAnswers[qi]===oi){ cls += " selected"; }
+          return `<button class="${cls}" data-qz="${qi}" data-opt="${oi}" ${state.quizSubmitted?'disabled':''}>${escapeHtml(opt)}</button>`;
+        }).join("")}
+        ${state.quizSubmitted && q.explanation ? `<div class="hint" style="font-size:12.5px; margin-top:4px;">💡 ${renderRich(q.explanation)}</div>` : ""}
+      </div>`).join("")}
+    ${!state.quizSubmitted ? `<button class="btn btn-primary btn-block" id="submit-quiz-btn">Valider mes réponses</button>` : `
+      <div style="text-align:center; font-weight:700; font-size:15px; margin-top:6px;">
+        Score : ${quizScore(quiz)} / ${quiz.questions.length}
+        ${official ? ` · +${quizScore(quiz)*10} points` : " · entraînement (points non comptabilisés)"}
+      </div>`}
+  </div>
+  ${state.quizSubmitted && wrongItems.length ? `
+  <div class="card">
+    <h3 style="margin-bottom:10px; font-size:14.5px;">📋 Résumé des erreurs</h3>
+    ${wrongItems.map(({q})=>`
+      <div style="border-bottom:1px solid var(--border); padding:8px 0;">
+        <div style="font-weight:600; font-size:13px; margin-bottom:3px;">${escapeHtml(q.question)}</div>
+        <div style="font-size:12.5px; color:var(--muted);">Bonne réponse : <strong>${escapeHtml(q.options[q.correct])}</strong></div>
+      </div>`).join("")}
+  </div>` : ""}
+  ${state.quizSubmitted ? `
+  <div class="row" style="margin-top:4px;">
+    <button class="btn btn-outline btn-block" id="quiz-change-subject">✏️ Changer de sujet</button>
+    <button class="btn btn-primary btn-block" id="quiz-retry-same" ${state.loading?'disabled':''}>${state.loading ? '<span class="spinner"></span>' : '🔁 Relancer (même sujet)'}</button>
+  </div>` : ""}`;
+}
+function quizScore(quiz){ let s=0; quiz.questions.forEach((q,qi)=>{ if(state.quizAnswers[qi]===q.correct) s++; }); return s; }
+
+function bindNotionDetail(){
+  const backBtn = document.getElementById('back-btn');
+  if(backBtn) backBtn.addEventListener('click', ()=> setState({ currentNotion:null, quiz:null }));
+  document.querySelectorAll('.notion-item[data-id]').forEach(el=> el.addEventListener('click', ()=> openNotion(el.dataset.id)));
+  const genBtn = document.getElementById('gen-quiz-notion');
+  if(genBtn) genBtn.addEventListener('click', ()=>{
+    const diff = document.getElementById('quiz-difficulty').value;
+    generateQuizFor(state.currentNotion.content, true, null, null, diff, state.currentNotion.category, state.currentNotion.id, state.currentNotion.title);
+  });
+  document.querySelectorAll('[data-correct-exo]').forEach(b=> b.addEventListener('click', ()=>{ const i=b.dataset.correctExo; correctExercise(i, document.getElementById('exo-answer-'+i).value); }));
+  document.querySelectorAll('[data-quiz-exo]').forEach(b=> b.addEventListener('click', ()=>{ const i=b.dataset.quizExo; const ex=state.currentNotion.exercises[i]; generateQuizFor(ex.text, true, 'exo'+i, 'exo-quiz-zone-'+i, 'moyen', state.currentNotion.category, null, null); }));
+  bindQuizInteractions();
+}
+function bindQuizInteractions(){
+  document.querySelectorAll('[data-qz]').forEach(b=> b.addEventListener('click', ()=>{ if(state.quizSubmitted) return; const qi=b.dataset.qz, oi=parseInt(b.dataset.opt); state.quizAnswers[qi]=oi; renderInPlace(); }));
+  const submitBtn = document.getElementById('submit-quiz-btn');
+  if(submitBtn) submitBtn.addEventListener('click', async ()=>{
+    setState({ quizSubmitted:true });
+    const missedItems = [];
+    state.quiz.questions.forEach((q,qi)=>{ if(state.quizAnswers[qi]!==q.correct){ missedItems.push({ question:q.question, options:q.options, correct:q.correct, explanation:q.explanation||"", source: state.quizNotionTitle||"" }); } });
+    await addMissed(missedItems);
+    if(state.quizIsOfficial){ const s = quizScore(state.quiz); await addPoints(s*10); showToast(`+${s*10} points !`); }
+    if(state.quizNotionId){
+      let hist = (await getJSON('user-history', false)) || [];
+      hist.unshift({ notionId: state.quizNotionId, title: state.quizNotionTitle, score: quizScore(state.quiz), total: state.quiz.questions.length, date: Date.now() });
+      hist = hist.slice(0,40);
+      await setJSON('user-history', hist, false);
+    }
+  });
+  // Avant : pour refaire un quiz sur le même sujet, il fallait tout reconfigurer / re-choisir
+  // la leçon à chaque fois. Ces deux boutons évitent de "réécrire" le thème à chaque fois.
+  const retrySame = document.getElementById('quiz-retry-same');
+  if(retrySame) retrySame.addEventListener('click', ()=>{
+    const p = state.lastQuizParams; if(!p) return;
+    generateQuizFor(p.content, p.isOfficial, p.loadingKey, p.targetZoneId, p.difficulty, p.category, p.notionId, p.notionTitle);
+  });
+  const changeSubject = document.getElementById('quiz-change-subject');
+  if(changeSubject) changeSubject.addEventListener('click', ()=>{
+    const p = state.lastQuizParams;
+    if(p && p.targetZoneId){ const zone = document.getElementById(p.targetZoneId); if(zone) zone.innerHTML = ""; setState({ quiz:null }); }
+    else{ setState({ currentNotion:null, quiz:null }); }
+  });
+}
+
+async function generateQuizFor(content, isOfficial, loadingKey, targetZoneId, difficulty, category, notionId, notionTitle){
+  setState({ loading: loadingKey || 'quiz' });
+  state.lastQuizParams = { content, isOfficial, loadingKey, targetZoneId, difficulty, category, notionId, notionTitle };
+  try{
+    const diffTxt = difficulty==='facile' ? "facile (questions simples, vocabulaire de base)" : difficulty==='difficile' ? "difficile (questions qui demandent de la réflexion et des subtilités)" : "de niveau moyen";
+    const text = await askClaude([{ role:"user", content: `Voici du contenu d'un cours ou d'un exercice scolaire :\n\n"""${content}"""\n\nGénère un QCM de 4 questions de difficulté ${diffTxt} pour tester la compréhension.${scientificInstruction(category)} Réponds UNIQUEMENT avec un objet JSON, sans texte autour, au format exact :\n{"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"..."}]}` }], { maxTokens: 1300 });
+    const quiz = parseJsonLoose(text);
+    if(!quiz || !quiz.questions || !quiz.questions.length){ showToast("Le quiz n'a pas pu être généré, réessaie."); setState({ loading:false }); return; }
+    setState({ quiz, quizAnswers:{}, quizSubmitted:false, quizIsOfficial:isOfficial, quizNotionId:notionId, quizNotionTitle:notionTitle, loading:false });
+    if(targetZoneId){ setTimeout(()=>{ const zone=document.getElementById(targetZoneId); if(zone){ zone.innerHTML = renderQuizBlock(quiz, targetZoneId, isOfficial); bindQuizInteractions(); typesetMath(zone); } },0); }
+  }catch(e){ console.error(e); showToast("Erreur pendant la génération du quiz."); setState({ loading:false }); }
+}
+async function correctExercise(i, answer){
+  if(!answer || !answer.trim()){ showToast("Écris d'abord une réponse."); return; }
+  setState({ loading: 'exo'+i });
+  try{
+    const ex = state.currentNotion.exercises[i];
+    const text = await askClaude([{ role:"user", content:`Voici un exercice scolaire :\n"""${ex.text}"""\n\nVoici la réponse d'un élève :\n"""${answer}"""\n\nCorrige cette réponse.${scientificInstruction(state.currentNotion.category)} Réponds UNIQUEMENT en JSON au format :\n{"correct": true/false, "feedback": "explication claire et bienveillante en français"}` }], { maxTokens: 600 });
+    const result = parseJsonLoose(text);
+    if(!result){ showToast("Correction impossible, réessaie."); setState({loading:false}); return; }
+    const newRes = {...(state.exoResult||{})}; newRes[i] = { correct: !!result.correct, feedback: result.feedback || "" };
+    setState({ exoResult: newRes, loading:false });
+    if(result.correct){ await addPoints(5); showToast("Bonne réponse ! +5 points"); }
+  }catch(e){ console.error(e); showToast("Erreur pendant la correction."); setState({ loading:false }); }
+}
+
+// =================== FLASHCARDS ===================
+let flashState = { subject:"", difficulty:"moyen", cards:[], index:0, correctCount:0, mistakes:[], answered:false, started:false, source:null };
+function renderFlashcardsHub(){
+  if(!flashState.started){
+    return `
+    <div class="section-title">Flashcards</div>
+    <div class="section-sub">Tape ce que tu veux réviser : Memora priorise ce qui est dans la base du site, et complète avec internet si besoin.</div>
+    <input type="text" id="flash-subject" placeholder="Ex : les verbes irréguliers..." value="${escapeHtml(flashState.subject)}" style="margin-bottom:10px;">
+    <label class="field-label">Niveau de difficulté</label>
+    <select id="flash-difficulty" style="margin-bottom:12px;">
+      <option value="facile" ${flashState.difficulty==='facile'?'selected':''}>Facile</option>
+      <option value="moyen" ${flashState.difficulty==='moyen'?'selected':''}>Moyen</option>
+      <option value="difficile" ${flashState.difficulty==='difficile'?'selected':''}>Difficile</option>
+    </select>
+    <button class="btn btn-primary btn-block" id="flash-generate" ${state.loading==='flash'?'disabled':''}>${state.loading==='flash' ? '<span class="spinner"></span> Génération...' : '✨ Générer la série'}</button>
+    ${(state.missed && state.missed.length) ? `<button class="btn btn-outline btn-block" id="review-mistakes-btn" style="margin-top:10px;">🔁 Revoir mes erreurs (${state.missed.length})</button>` : ""}
+    <div id="review-zone" style="margin-top:14px;"></div>`;
+  }
+  if(flashState.index >= flashState.cards.length){
+    const mistakes = flashState.mistakes||[];
+    return `<div class="card" style="text-align:center;">
+      <div style="font-size:40px; margin-bottom:8px;">🎉</div>
+      <h2 style="margin-bottom:8px;">Série terminée !</h2>
+      <div style="font-size:18px; font-weight:800; margin-bottom:6px;">${flashState.correctCount} / ${flashState.cards.length} bonnes réponses</div>
+      <div style="font-size:13px; color:var(--muted); margin-bottom:16px;">${mistakes.length} erreur(s)</div>
+    </div>
+    ${mistakes.length ? `<div class="card"><h3 style="margin-bottom:10px; font-size:14.5px;">📋 Résumé des erreurs</h3>${mistakes.map(c=>`
+      <div style="border-bottom:1px solid var(--border); padding:8px 0;">
+        <div style="font-weight:600; font-size:13px; margin-bottom:3px;">${renderRich(c.statement)}</div>
+        <div style="font-size:12.5px; color:var(--muted);">Bonne réponse : <strong>${c.correct?'Vrai':'Faux'}</strong>${c.explanation ? ' — '+renderRich(c.explanation) : ''}</div>
+      </div>`).join("")}</div>` : ""}
+    <div class="row" style="margin-top:4px;">
+      <button class="btn btn-outline btn-block" id="flash-restart">Nouveau sujet</button>
+      <button class="btn btn-primary btn-block" id="flash-retry-same" ${state.loading==='flash'?'disabled':''}>${state.loading==='flash' ? '<span class="spinner"></span>' : '🔁 Relancer le même thème'}</button>
+    </div>`;
+  }
+  const card = flashState.cards[flashState.index];
+  const answered = flashState.answered;
+  const isRight = answered ? (flashState.lastRight) : null;
+  return `
+  <div class="flash-progress">Carte ${flashState.index+1} / ${flashState.cards.length}${flashState.source ? ` · <span style="color:${flashState.source==='site'?'#4CAF7D':'#B0603F'};">${flashState.source==='site' ? '📚 base du site' : '🌐 internet'}</span>` : ""}</div>
+  <div class="flash-card" id="flash-card-el">${renderRich(card.statement)}</div>
+  ${!answered ? `
+  <div class="row">
+    <button class="btn btn-danger btn-block" id="flash-no">❌ Faux</button>
+    <button class="btn btn-mint btn-block" id="flash-yes">✅ Vrai</button>
+  </div>` : `
+  <div class="card" style="padding:12px; font-size:13px; background:${isRight?'#E4F7ED':'#FBEAEB'};">
+    <div style="font-weight:700; margin-bottom:4px;">${isRight?'✅ Correct':'❌ Faux — la bonne réponse était : '+(card.correct?'Vrai':'Faux')}</div>
+    ${card.explanation ? `<div>${renderRich(card.explanation)}</div>` : ""}
+  </div>
+  <button class="btn btn-primary btn-block" id="flash-continue" style="margin-top:10px;">Continuer →</button>`}
+  <div id="flash-feedback"></div>`;
+}
+function bindFlashcardsHub(){
+  const genBtn = document.getElementById('flash-generate');
+  if(genBtn){
+    const subjInput = document.getElementById('flash-subject');
+    if(subjInput) subjInput.addEventListener('input', e=> flashState.subject = e.target.value);
+    const diffSel = document.getElementById('flash-difficulty');
+    if(diffSel) diffSel.addEventListener('change', e=> flashState.difficulty = e.target.value);
+    genBtn.addEventListener('click', ()=> generateFlashSeries());
+  }
+  const rev = document.getElementById('review-mistakes-btn');
+  if(rev) rev.addEventListener('click', ()=>{
+    const cards = state.missed.map(m=> ({ statement: m.question + " — " + m.options[m.correct], correct:true, explanation: m.explanation }));
+    if(!cards.length){ showToast("Aucune erreur enregistrée."); return; }
+    flashState = { subject:"Révision des erreurs", difficulty:flashState.difficulty, cards, index:0, correctCount:0, mistakes:[], answered:false, started:true, source:null };
+    renderInPlace();
+  });
+  const yes = document.getElementById('flash-yes'), no = document.getElementById('flash-no');
+  if(yes) yes.addEventListener('click', ()=> answerFlash(true));
+  if(no) no.addEventListener('click', ()=> answerFlash(false));
+  const cont = document.getElementById('flash-continue');
+  if(cont) cont.addEventListener('click', nextFlashCard);
+  const restart = document.getElementById('flash-restart');
+  if(restart) restart.addEventListener('click', ()=>{ flashState = { subject:"", difficulty:flashState.difficulty, cards:[], index:0, correctCount:0, mistakes:[], answered:false, started:false, source:null }; renderInPlace(); });
+  const retrySame = document.getElementById('flash-retry-same');
+  if(retrySame) retrySame.addEventListener('click', ()=> generateFlashSeries(true));
+  const cardEl = document.getElementById('flash-card-el');
+  if(cardEl && !flashState.answered){
+    let startX = null;
+    cardEl.addEventListener('touchstart', e=>{ startX = e.touches[0].clientX; });
+    cardEl.addEventListener('touchend', e=>{
+      if(startX===null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if(Math.abs(dx) > 60){ answerFlash(dx < 0 ? true : false); }
+      startX = null;
+    });
+  }
+}
+// Génère une série de flashcards. Priorité systématique au contenu déjà présent dans la
+// base du site (notions correspondant au sujet) ; ce n'est QUE si rien n'y correspond que
+// le site va chercher un complément sur internet — jamais l'inverse.
+async function generateFlashSeries(keepSubject){
+  const subject = keepSubject ? flashState.subject : flashState.subject;
+  if(!subject.trim()){ showToast("Écris d'abord un sujet."); return; }
+  setState({ loading:'flash' });
+  const q = normalize(subject);
+  const matching = state.notionsIndex.filter(n=> normalize(n.title).includes(q) || normalize(n.category).includes(q) || normalize(n.tags||"").includes(q));
+  let combinedContent = "", source = null;
+  if(matching.length){
+    for(const m of matching.slice(0,5)){ const full = await getJSON('notion:'+m.id, true); if(full) combinedContent += `\n\n### ${full.title}\n${full.content}`; }
+    source = 'site';
+  }
+  if(!combinedContent){
+    // Rien dans la base : on complète avec internet, comme demandé.
+    try{ combinedContent = await askClaudeWithWebSearch([{ role:"user", content:`Fais une recherche sur internet sur ce sujet scolaire : "${subject}" et résume les points clés en français.` }]); }catch(e){ console.error(e); }
+    if(!combinedContent) combinedContent = subject;
+    source = 'web';
+  }
+  const diffTxt = flashState.difficulty==='facile' ? "facile (affirmations simples et directes)" : flashState.difficulty==='difficile' ? "difficile (affirmations subtiles, pièges classiques, nuances)" : "de niveau moyen";
+  try{
+    const text = await askClaude([{ role:"user", content:`Voici du contenu scolaire sur le sujet "${subject}" :\n"""${combinedContent}"""\n\nGénère une série de 8 flashcards de type vrai/faux de difficulté ${diffTxt}.${scientificInstruction(subject)} Réponds UNIQUEMENT en JSON :\n{"cards":[{"statement":"affirmation à évaluer","correct":true,"explanation":"courte explication claire"}]}` }], { maxTokens: 1400 });
+    const parsed = parseJsonLoose(text);
+    setState({ loading:false });
+    if(!parsed || !parsed.cards || !parsed.cards.length){ showToast("Impossible de générer la série."); return; }
+    flashState = { subject, difficulty: flashState.difficulty, cards: parsed.cards, index:0, correctCount:0, mistakes:[], answered:false, started:true, source };
+    renderInPlace();
+  }catch(e){ console.error(e); setState({ loading:false }); showToast("Erreur pendant la génération."); }
+}
+function answerFlash(userSaysTrue){
+  if(flashState.answered) return; // déjà répondu à cette carte, on attend "Continuer"
+  const card = flashState.cards[flashState.index];
+  const isRight = userSaysTrue === !!card.correct;
+  if(isRight) flashState.correctCount++;
+  else flashState.mistakes = [...(flashState.mistakes||[]), card];
+  flashState.answered = true;
+  flashState.lastRight = isRight;
+  // Avant : l'explication disparaissait après 900ms sans laisser le temps de la lire.
+  // Maintenant elle reste affichée tant que l'élève n'a pas cliqué sur "Continuer".
+  renderInPlace();
+}
+function nextFlashCard(){
+  flashState.index++;
+  flashState.answered = false;
+  renderInPlace();
+}
+
+// =================== FICHES ===================
+let ficheSubject = "";
+function renderFiches(){
+  return `
+  <div class="section-title">Fiches de révision</div>
+  <div class="section-sub">Tape ce que tu veux réviser, l'IA compile une fiche.</div>
+  <input type="text" id="fiche-subject" placeholder="Ex : la conjugaison au futur..." value="${escapeHtml(ficheSubject)}" style="margin-bottom:12px;">
+  <button class="btn btn-primary btn-block" id="fiche-generate" ${state.loading==='fiche'?'disabled':''}>${state.loading==='fiche' ? '<span class="spinner"></span> Génération...' : '📝 Générer la fiche'}</button>
+  <div id="fiche-zone" style="margin-top:16px;"></div>`;
+}
+function bindFiches(){
+  const fSub = document.getElementById('fiche-subject');
+  if(fSub) fSub.addEventListener('input', e=> ficheSubject = e.target.value);
+  const fGen = document.getElementById('fiche-generate');
+  if(fGen) fGen.addEventListener('click', generateFiche);
+}
+async function generateFiche(){
+  if(!ficheSubject.trim()){ showToast("Écris d'abord un sujet."); return; }
+  setState({ loading:'fiche' });
+  const q = normalize(ficheSubject);
+  const matching = state.notionsIndex.filter(n=> normalize(n.title).includes(q) || normalize(n.category).includes(q) || normalize(n.tags||"").includes(q));
+  let combined = "", source = null;
+  if(matching.length){
+    for(const m of matching.slice(0,6)){ const full = await getJSON('notion:'+m.id, true); if(full){ combined += `\n\n### ${full.title}\n${full.content}`; (full.exercises||[]).forEach(ex=> combined += `\nExercice : ${ex.text}`); } }
+    source = 'site';
+  }
+  if(!combined){
+    // Rien dans la base pour ce sujet : on propose une recherche sur internet à la place
+    // (comme pour les notions), plutôt que de bloquer sur "aucune notion trouvée".
+    try{ combined = await askClaudeWithWebSearch([{ role:"user", content:`Fais une recherche sur internet sur ce sujet scolaire : "${ficheSubject}" et résume les points clés en français.` }]); }catch(e){ console.error(e); }
+    if(!combined){ setState({ loading:false }); showToast("Rien trouvé pour ce sujet, réessaie avec d'autres mots."); return; }
+    source = 'web';
+  }
+  try{
+    const text = await askClaude([{ role:"user", content:`Voici du contenu scolaire sur "${ficheSubject}" :\n"""${combined}"""\n\nCompile une fiche de révision claire et structurée (titres, listes à puces).${scientificInstruction(ficheSubject)} Réponds uniquement avec le contenu de la fiche.` }], { maxTokens: 1400 });
+    setState({ loading:false });
+    const zone = document.getElementById('fiche-zone');
+    if(zone){
+      zone.innerHTML = `<div class="card"><div class="tag ${source==='site'?'tag-mint':''}" ${source==='web'?'style="background:var(--peach-soft); color:#B0603F;"':''}>${source==='site' ? '📚 Depuis la base du site' : '🌐 Complétée avec internet'}</div><div style="font-size:13.5px; line-height:1.65;">${renderRich(text)}</div></div>`;
+      typesetMath(zone);
+    }
+  }catch(e){ console.error(e); setState({ loading:false }); showToast("Erreur pendant la génération."); }
+}
+
+// =================== CLASSEMENT ===================
+let leaderboardCache = null;
+function renderClassement(){
+  return `
+  <div class="section-title">Classement</div>
+  <div class="section-sub">Points gagnés via les quiz officiels et exercices.</div>
+  <div class="card" id="leader-card">${leaderboardCache===null ? `<div class="empty"><span class="spinner spinner-dark"></span></div>` : renderLeaderRows(leaderboardCache)}</div>
+  ${state.streak.count>0 ? `<div class="card"><div style="font-size:13.5px;">🔥 Série actuelle : <strong>${state.streak.count} jour(s)</strong></div></div>` : ""}
+  <div id="history-zone"></div>`;
+}
+function renderLeaderRows(rows){
+  if(rows.length===0) return `<div class="empty"><div class="empty-emoji">🏆</div>Personne n'a encore de points.</div>`;
+  const medals = ['🥇','🥈','🥉'];
+  return rows.map((r,i)=>`<div class="leader-row">
+      <div class="leader-rank">${i<3 ? medals[i] : (i+1)}</div>
+      <div style="flex:1; font-weight:600;">${escapeHtml(r.name)}${r.name===state.userName?' (toi)':''}</div>
+      <div style="font-weight:800; color:var(--lavender);">${r.points} pts</div>
+    </div>`).join("");
+}
+async function bindClassement(){
+  loadHistoryZone();
+  if(leaderboardCache!==null) return;
+  try{
+    const list = await safeStorage.list('score:', true);
+    const keys = (list && list.keys) || []; const rows = [];
+    for(const k of keys){ const v = await getJSON(k, true); if(v) rows.push(v); }
+    rows.sort((a,b)=> b.points - a.points);
+    leaderboardCache = rows;
+    const el = document.getElementById('leader-card'); if(el) el.innerHTML = renderLeaderRows(rows);
+  }catch(e){ console.error(e); }
+}
+
+// =================== CHAT ===================
+let chatPollHandle = null, lastRenderedMsgCount = -1;
+function renderChat(){
+  return `
+  <div class="section-title">Chat d'entraide</div>
+  <div class="section-sub">Pose une question, quelqu'un pourra t'aider.</div>
+  <div class="chat-list" id="chat-list"><div class="empty"><span class="spinner spinner-dark"></span></div></div>
+  <div class="row"><input type="text" id="chat-input" placeholder="Écris un message..."><button class="btn btn-primary" id="chat-send">Envoyer</button></div>`;
+}
+function bindChat(){
+  const sBtn = document.getElementById('chat-send');
+  const cInput = document.getElementById('chat-input');
+  if(sBtn) sBtn.addEventListener('click', sendChatMessage);
+  if(cInput) cInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendChatMessage(); });
+}
+async function sendChatMessage(){
+  const input = document.getElementById('chat-input'); if(!input) return;
+  const text = input.value.trim(); if(!text) return; input.value="";
+  try{
+    const msgs = (await getJSON('chat-messages', true)) || [];
+    msgs.push({ id: uid(), name: state.userName, text, time: Date.now(), reports:0 });
+    while(msgs.length > 100) msgs.shift();
+    await setJSON('chat-messages', msgs, true);
+    lastRenderedMsgCount = -1; await refreshChat();
+  }catch(e){ console.error(e); }
+}
+async function refreshChat(){
+  const msgs = (await getJSON('chat-messages', true)) || [];
+  if(msgs.length === lastRenderedMsgCount) return;
+  lastRenderedMsgCount = msgs.length;
+  const list = document.getElementById('chat-list'); if(!list) return;
+  if(msgs.length===0){ list.innerHTML = `<div class="empty">💬<br>Aucun message pour l'instant.</div>`; return; }
+  list.innerHTML = msgs.map(m=>`
+    <div class="msg ${m.name===state.userName?'mine':''}">
+      <div class="msg-name">${escapeHtml(m.name)}${m.reports>0 ? ' ⚠️' : ''}</div>
+      <div class="msg-bubble">${escapeHtml(m.text)}</div>
+      <div class="msg-actions">
+        ${m.name!==state.userName ? `<button class="msg-action-btn" data-report="${m.id}">Signaler</button>` : ""}
+        ${state.isAdmin ? `<button class="msg-action-btn" data-del-msg="${m.id}">🗑️ Supprimer</button>` : ""}
+      </div>
+    </div>`).join("");
+  list.scrollTop = list.scrollHeight;
+  document.querySelectorAll('[data-report]').forEach(b=> b.addEventListener('click', ()=> reportMessage(b.dataset.report)));
+  document.querySelectorAll('[data-del-msg]').forEach(b=> b.addEventListener('click', ()=> showConfirmModal("Supprimer ce message ?", ()=> deleteMessage(b.dataset.delMsg))));
+}
+async function reportMessage(id){
+  let msgs = (await getJSON('chat-messages', true)) || [];
+  msgs = msgs.map(m=> m.id===id ? {...m, reports:(m.reports||0)+1} : m);
+  await setJSON('chat-messages', msgs, true);
+  showToast("Message signalé.");
+  lastRenderedMsgCount = -1; refreshChat();
+}
+async function deleteMessage(id){
+  let msgs = (await getJSON('chat-messages', true)) || [];
+  msgs = msgs.filter(m=> m.id!==id);
+  await setJSON('chat-messages', msgs, true);
+  lastRenderedMsgCount = -1; refreshChat();
+}
+function startChatAfterRender(){ refreshChat(); stopChatPolling(); chatPollHandle = setInterval(()=>{ if(state.screen==='chat' && !state.currentNotion) refreshChat(); }, 4000); }
+function stopChatPolling(){ if(chatPollHandle){ clearInterval(chatPollHandle); chatPollHandle=null; } }
+
+// =================== ENTRAÎNEMENT PERSONNEL ===================
+function renderPerso(){
+  return `
+  <div class="section-title">Entraînement personnel</div>
+  <div class="section-sub">Prends en photo un cours ou un exercice : Memora l'analyse.</div>
+  <div class="card"><div class="file-drop" id="perso-drop">📷 Choisir ou prendre une photo</div>
+  <input type="file" id="perso-file" accept="image/*" style="display:none;"></div>
+  <div id="perso-zone"></div>`;
+}
+function bindPerso(){
+  const drop = document.getElementById('perso-drop'), file = document.getElementById('perso-file');
+  if(drop && file){
+    drop.addEventListener('click', ()=> file.click());
+    file.addEventListener('change', async ()=>{ if(!file.files[0]) return; await handlePersoImage(file.files[0]); });
+  }
+}
+async function handlePersoImage(f){
+  const zone = document.getElementById('perso-zone');
+  if(!zone) return;
+  zone.innerHTML = `<div class="empty"><span class="spinner spinner-dark"></span><br>Analyse de l'image...</div>`;
+  try{
+    const base64 = await fileToBase64(f);
+    const text = await askClaude([{ role:"user", content:[ { type:"image", source:{ type:"base64", media_type: f.type||"image/jpeg", data: base64 } }, { type:"text", text:"Extrait et résume le contenu de façon claire et structurée en français. Réponds uniquement avec le texte." } ] }], { maxTokens: 900 });
+    zone.innerHTML = `<div class="card"><div class="tag tag-mint">Contenu détecté</div><div style="font-size:13.5px; line-height:1.6;">${renderRich(text)}</div></div>
+    <button class="btn btn-primary btn-block" id="perso-gen-quiz">✨ Générer un quiz d'entraînement</button>
+    <div id="perso-quiz-zone" style="margin-top:14px;"></div>`;
+    typesetMath(zone);
+    const qBtn = document.getElementById('perso-gen-quiz');
+    if(qBtn) qBtn.addEventListener('click', ()=> generatePersoQuiz(text));
+  }catch(e){ console.error(e); zone.innerHTML = `<div class="empty">❌ Impossible d'analyser cette image.</div>`; }
+}
+async function generatePersoQuiz(content){
+  setState({ loading:'persoquiz' });
+  state.lastQuizParams = { content, isOfficial:false, loadingKey:'persoquiz', targetZoneId:'perso-quiz-zone', difficulty:'moyen', category:'', notionId:null, notionTitle:null };
+  try{
+    const text = await askClaude([{ role:"user", content:`Voici un contenu scolaire :\n"""${content}"""\n\nGénère un QCM de 4 questions.${scientificInstruction(content)} Réponds UNIQUEMENT en JSON :\n{"questions":[{"question":"...","options":["...","...","...","..."],"correct":0,"explanation":"..."}]}` }], { maxTokens: 1200 });
+    const quiz = parseJsonLoose(text); setState({ loading:false });
+    const zone = document.getElementById('perso-quiz-zone');
+    if(!zone) return;
+    if(!quiz){ zone.innerHTML = `<div class="empty">Le quiz n'a pas pu être généré.</div>`; return; }
+    state.quiz = quiz; state.quizAnswers={}; state.quizSubmitted=false; state.quizIsOfficial=false; state.quizNotionId=null;
+    zone.innerHTML = renderQuizBlock(quiz, 'perso-quiz-zone', false); bindQuizInteractions(); typesetMath(zone);
+  }catch(e){ console.error(e); setState({ loading:false }); showToast("Erreur."); }
+}
+
+async function loadHistoryZone(){
+  const hist = (await getJSON('user-history', false)) || [];
+  const zone = document.getElementById('history-zone'); if(!zone) return;
+  if(!hist.length){ zone.innerHTML = ""; return; }
+  zone.innerHTML = `<div class="card"><h3 style="margin-bottom:10px; font-size:14px;">📈 Historique récent</h3>${hist.slice(0,8).map(h=>`
+    <div style="display:flex; justify-content:space-between; font-size:12.5px; padding:6px 0; border-bottom:1px solid var(--border);">
+      <span>${escapeHtml(h.title||'Quiz')}</span><span style="font-weight:700;">${h.score}/${h.total}</span>
+    </div>`).join("")}</div>`;
+}
+
+// =================== ADMIN ===================
+let editingNotionId = null, editingNotionData = null;
+function renderAdmin(){
+  if(!state.isAdmin){
+    return `<div class="section-title">Espace admin</div>
+    <div class="section-sub">Entre le code admin.</div>
+    <div class="card"><input type="password" id="admin-code" placeholder="Code admin" style="margin-bottom:10px;"><button class="btn btn-primary btn-block" id="admin-login">Valider</button></div>`;
+  }
+  return `
+  <div class="section-title">Ajouter une notion</div>
+  <div class="section-sub">Ajoute une ou plusieurs photos de cours.</div>
+  <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+    <div>
+      <div style="font-weight:700; font-size:13.5px;">🌙 Mode sombre</div>
+      <div style="font-size:12px; color:var(--muted);">S'applique à tout le site, y compris ici.</div>
+    </div>
+    <button class="btn ${getStoredTheme()==='dark' ? 'btn-primary' : 'btn-outline'} btn-sm" id="theme-toggle-btn">${getStoredTheme()==='dark' ? 'Activé' : 'Désactivé'}</button>
+  </div>
+  <div class="card">
+    <div class="file-drop" id="admin-drop">📷 Ajouter des photos de cours</div>
+    <input type="file" id="admin-file" accept="image/*" multiple style="display:none;">
+  </div>
+  <div id="admin-form-zone"></div>
+  <div id="pending-zone"></div>
+  <div class="divider"></div>
+  <h3 style="margin-bottom:10px;">👥 Comptes utilisateurs</h3>
+  <p class="section-sub" style="margin-bottom:10px;">Liste des élèves qui se sont déjà connectés ou inscrits. Un compte banni ne peut plus se connecter.</p>
+  <div id="users-list-zone"><div class="empty" style="padding:14px;"><span class="spinner spinner-dark"></span></div></div>
+  <div class="divider"></div>
+  <h3 style="margin-bottom:10px;">🔐 Codes de connexion en attente</h3>
+  <p class="section-sub" style="margin-bottom:10px;">Un code s'affiche ici à chaque tentative de connexion d'un élève. Transmets-le lui pour qu'il puisse valider.</p>
+  <div id="login-codes-zone"><div class="empty" style="padding:14px;"><span class="spinner spinner-dark"></span></div></div>
+  ${isMasterAdmin() ? `
+  <div class="divider"></div>
+  <h3 style="margin-bottom:10px;">👑 Gestion des admins</h3>
+  <div class="card">
+    <label class="field-label">Code d'accès admin actuel</label>
+    <div style="font-size:20px; font-weight:800; letter-spacing:3px; color:var(--lavender); margin-bottom:10px;" id="admin-code-display">••••••</div>
+    <div class="row">
+      <button class="btn btn-outline btn-sm" id="reveal-admin-code-btn" style="flex:1;">👁️ Afficher</button>
+      <button class="btn btn-outline btn-sm" id="change-admin-code-btn" style="flex:1;">🔄 Changer</button>
+    </div>
+  </div>
+  <h4 style="margin:12px 0 8px; font-size:13px; color:var(--muted);">Admins promus via le code</h4>
+  <div id="admins-list-zone"></div>
+  ` : ""}
+  <div class="divider"></div>
+  <button class="btn btn-outline btn-block" id="rename-category-btn" style="margin-bottom:10px;">🏷️ Renommer une catégorie / classe</button>
+  <button class="btn btn-outline btn-block" id="export-overview-btn" style="margin-bottom:14px;">📊 Aperçu global</button>
+  <div id="overview-zone"></div>
+  <h3 style="margin-bottom:10px;">Notions existantes (${state.notionsIndex.length})</h3>
+  ${state.notionsIndex.map(n=>{
+    if(editingNotionId === n.id && editingNotionData){
+      const d = editingNotionData;
+      return `<div class="notion-item" style="cursor:default;">
+        <div class="edit-field-row"><label class="field-label">Titre</label><input type="text" id="edit-title-${n.id}" value="${escapeHtml(d.title||"")}"></div>
+        <div class="grid2 edit-field-row">
+          <div><label class="field-label">Classe</label><input type="text" id="edit-classe-${n.id}" value="${escapeHtml(d.classe||"")}"></div>
+          <div><label class="field-label">Matière</label><input type="text" id="edit-category-${n.id}" value="${escapeHtml(d.category||"")}"></div>
+        </div>
+        <div class="edit-field-row"><label class="field-label">Tags</label><input type="text" id="edit-tags-${n.id}" value="${escapeHtml(d.tags||"")}"></div>
+        <div class="row"><button class="btn btn-outline btn-sm btn-block" data-cancel-edit="${n.id}">Annuler</button><button class="btn btn-primary btn-sm btn-block" data-save-edit="${n.id}">Enregistrer</button></div>
+      </div>`;
+    }
+    return `
+    <div class="notion-item" style="cursor:default;">
+      <div class="notion-title">${escapeHtml(n.title)}</div>
+      <div class="notion-cat">${n.classe ? escapeHtml(n.classe)+' · ' : ''}${escapeHtml(n.category)}</div>
+      <div class="row wrap" style="margin-top:8px;">
+        <button class="btn btn-outline btn-sm" data-edit-notion="${n.id}" style="flex:1;">✏️ Modifier</button>
+        <button class="btn btn-outline btn-sm" data-link-notion="${n.id}" style="flex:1;">🔗 Lier</button>
+        <button class="btn btn-danger btn-sm" data-del-notion="${n.id}" style="flex:1;">🗑️ Suppr.</button>
+      </div>
+    </div>`;
+  }).join("")}
+  `;
+}
+function bindAdmin(){
+  if(!state.isAdmin){
+    const lBtn = document.getElementById('admin-login');
+    const cInput = document.getElementById('admin-code');
+    if(lBtn && cInput){
+      lBtn.addEventListener('click', async ()=>{
+        const code = cInput.value.trim();
+        const ok = await checkAdminCode(code);
+        if(!ok){ showToast("Code incorrect."); return; }
+        const list = (await getJSON('admin-usernames', true)) || [];
+        const norm = normalize(state.userName);
+        if(!list.includes(norm)){ list.push(norm); await setJSON('admin-usernames', list, true); }
+        setStoredIsAdmin(true, state.userName);
+        setState({ isAdmin:true });
+        showToast("Accès admin activé !");
+      });
+    }
+    return;
+  }
+  const drop = document.getElementById('admin-drop'), file = document.getElementById('admin-file');
+  const themeBtn = document.getElementById('theme-toggle-btn');
+  if(themeBtn) themeBtn.addEventListener('click', ()=>{
+    const next = getStoredTheme()==='dark' ? 'light' : 'dark';
+    setStoredTheme(next);
+    renderInPlace();
+  });
+  if(drop && file){
+    drop.addEventListener('click', ()=> file.click());
+    file.addEventListener('change', async ()=>{ if(!file.files.length) return; await handleAdminImages(Array.from(file.files)); });
+  }
+  document.querySelectorAll('[data-del-notion]').forEach(b=> b.addEventListener('click', ()=>{
+    showConfirmModal("Supprimer cette notion ? Cette action est définitive.", async ()=>{
+      const id = b.dataset.delNotion;
+      const previousIndex = state.notionsIndex;
+      const newIndex = previousIndex.filter(n=>n.id!==id);
+      setState({ notionsIndex:newIndex }); // mise à jour optimiste de l'UI
+      const okIndex = await setJSON('notions-index', newIndex, true);
+      if(!okIndex){
+        // échec réel de la sauvegarde : on annule visuellement pour ne pas mentir à l'admin
+        setState({ notionsIndex:previousIndex });
+        showToast("❌ Échec de la suppression (connexion/serveur). Réessaie.");
+        return;
+      }
+      // Nettoyage : retirer cette notion des "notions liées" des autres fiches, puis supprimer l'objet lui-même
+      const removed = await getJSON('notion:'+id, true);
+      if(removed && removed.linkedTo && removed.linkedTo.length){
+        for(const link of removed.linkedTo){
+          const other = await getJSON('notion:'+link.id, true);
+          if(other){ other.linkedTo = (other.linkedTo||[]).filter(l=>l.id!==id); await setJSON('notion:'+link.id, other, true); }
+        }
+      }
+      await deleteJSON('notion:'+id, true);
+      showToast("Notion supprimée.");
+    });
+  }));
+  document.querySelectorAll('[data-edit-notion]').forEach(b=> b.addEventListener('click', ()=> startEditNotion(b.dataset.editNotion)));
+  document.querySelectorAll('[data-cancel-edit]').forEach(b=> b.addEventListener('click', ()=>{ editingNotionId=null; editingNotionData=null; renderInPlace(); }));
+  document.querySelectorAll('[data-save-edit]').forEach(b=> b.addEventListener('click', ()=> saveEditNotion(b.dataset.saveEdit)));
+  document.querySelectorAll('[data-link-notion]').forEach(b=> b.addEventListener('click', ()=> linkNotionFlow(b.dataset.linkNotion)));
+  const exportBtn = document.getElementById('export-overview-btn');
+  if(exportBtn) exportBtn.addEventListener('click', showOverview);
+  const renameCatBtn = document.getElementById('rename-category-btn');
+  if(renameCatBtn) renameCatBtn.addEventListener('click', renameCategoryFlow);
+  loadPendingZone();
+  loadLoginCodesZone();
+  loadUsersListZone();
+  if(isMasterAdmin()){
+    const revealBtn = document.getElementById('reveal-admin-code-btn');
+    if(revealBtn) revealBtn.addEventListener('click', async ()=>{
+      const stored = await getJSON('admin-code', true);
+      const code = (stored && stored.code) || "0000";
+      const disp = document.getElementById('admin-code-display');
+      if(disp) disp.textContent = code;
+    });
+    const changeBtn = document.getElementById('change-admin-code-btn');
+    if(changeBtn) changeBtn.addEventListener('click', ()=>{
+      showPromptModal("Nouveau code admin", "", async (val)=>{
+        val = (val||"").trim();
+        if(!val){ showToast("Code vide, annulé."); return; }
+        const ok = await setJSON('admin-code', { code: val }, true);
+        showToast(ok ? "Code admin mis à jour." : "❌ Échec de la mise à jour du code.");
+      });
+    });
+    loadAdminsListZone();
+  }
+}
+async function loadAdminsListZone(){
+  const zone = document.getElementById('admins-list-zone'); if(!zone) return;
+  const list = (await getJSON('admin-usernames', true)) || [];
+  if(!list.length){ zone.innerHTML = `<div class="empty" style="padding:12px;"><small class="hint">Aucun admin promu via le code pour l'instant.</small></div>`; return; }
+  zone.innerHTML = list.map(u=>`
+    <div class="notion-item" style="cursor:default; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+      <span style="font-weight:700;">${escapeHtml(u)}</span>
+      <button class="btn btn-danger btn-sm" data-revoke-admin="${escapeHtml(u)}">Retirer</button>
+    </div>`).join("");
+  document.querySelectorAll('[data-revoke-admin]').forEach(b=> b.addEventListener('click', ()=>{
+    const target = b.dataset.revokeAdmin;
+    showConfirmModal(`Retirer l'accès admin à "${target}" ?`, async ()=>{
+      const cur = (await getJSON('admin-usernames', true)) || [];
+      const updated = cur.filter(u=>u!==target);
+      const ok = await setJSON('admin-usernames', updated, true);
+      showToast(ok ? "Accès admin retiré." : "❌ Échec, réessaie.");
+      loadAdminsListZone();
+    });
+  }));
+}
+async function startEditNotion(id){
+  setState({ loading:true });
+  const notion = await getJSON('notion:'+id, true);
+  setState({ loading:false });
+  if(!notion){ showToast("❌ Impossible de charger cette notion (problème de connexion)."); return; }
+  editingNotionId = id; editingNotionData = notion; renderInPlace();
+}
+async function saveEditNotion(id){
+  const newTitle = document.getElementById('edit-title-'+id).value.trim();
+  const newClasse = document.getElementById('edit-classe-'+id).value.trim();
+  const newCat = document.getElementById('edit-category-'+id).value.trim();
+  const newTags = document.getElementById('edit-tags-'+id).value.trim();
+  if(!newTitle){ showToast("Le titre est obligatoire."); return; }
+  const notion = await getJSON('notion:'+id, true);
+  if(!notion){ showToast("❌ Notion introuvable (problème de connexion)."); return; }
+  notion.title = newTitle; notion.classe = newClasse; notion.category = newCat || notion.category; notion.tags = newTags;
+  const okNotion = await setJSON('notion:'+id, notion, true);
+  const idx = state.notionsIndex.map(n=> n.id===id ? {...n, title:notion.title, classe:notion.classe, category:notion.category, tags:notion.tags} : n);
+  const okIndex = await setJSON('notions-index', idx, true);
+  if(!okNotion || !okIndex){
+    showToast("❌ Échec de l'enregistrement (connexion/serveur). Réessaie.");
+    return; // on laisse le formulaire ouvert pour ne pas perdre la saisie
+  }
+  editingNotionId = null; editingNotionData = null;
+  setState({ notionsIndex:idx }); showToast("Notion mise à jour.");
+}
+async function renameCategoryFlow(){
+  const categories = [...new Set(state.notionsIndex.map(n=> n.category).filter(Boolean))].sort();
+  if(!categories.length){ showToast("Aucune catégorie pour l'instant."); return; }
+  openModal(`
+    <label class="field-label">Quelle catégorie / classe veux-tu renommer ?</label>
+    <p style="color:var(--muted); font-size:12px; margin:0 0 10px;">Ex : passer "Terminale A" en "Terminale D" partout d'un coup.</p>
+    <div style="max-height:300px; overflow-y:auto; margin:8px 0 12px;">
+      ${categories.map(c=>`<button class="option-btn" data-cat-target="${escapeHtml(c)}">${escapeHtml(c)} <span style="color:var(--muted); font-weight:400;">(${state.notionsIndex.filter(n=>n.category===c).length} notion(s))</span></button>`).join("")}
+    </div>
+    <button class="btn btn-outline btn-block" id="modal-cancel">Annuler</button>`);
+  const mCancel = document.getElementById('modal-cancel');
+  if(mCancel) mCancel.addEventListener('click', closeModal);
+  document.querySelectorAll('[data-cat-target]').forEach(b=> b.addEventListener('click', ()=>{
+    const oldCat = b.dataset.catTarget;
+    closeModal();
+    showPromptModal(`Nouveau nom pour "${oldCat}"`, oldCat, async (newCatRaw)=>{
+      const newCat = (newCatRaw||"").trim();
+      if(!newCat || newCat===oldCat) return;
+      setState({ loading:true });
+      const affected = state.notionsIndex.filter(n=> n.category===oldCat);
+      let allOk = true;
+      for(const n of affected){
+        const full = await getJSON('notion:'+n.id, true);
+        if(full){ full.category = newCat; const ok = await setJSON('notion:'+n.id, full, true); if(!ok) allOk = false; }
+        else allOk = false;
+      }
+      const newIndex = state.notionsIndex.map(n=> n.category===oldCat ? {...n, category:newCat} : n);
+      const okIdx = await setJSON('notions-index', newIndex, true);
+      setState({ notionsIndex:newIndex, loading:false });
+      if(!allOk || !okIdx) showToast("⚠️ Renommage partiel — vérifie la liste des notions.");
+      else showToast(`Catégorie renommée en "${newCat}" (${affected.length} notion(s)).`);
+    });
+  }));
+}
+async function loadUsersListZone(){
+  const zone = document.getElementById('users-list-zone'); if(!zone) return;
+  const users = (await getJSON('all-users', true)) || [];
+  const bannedList = (await getJSON('banned-usernames', true)) || [];
+  const bannedSet = new Set(bannedList);
+  if(!users.length){ zone.innerHTML = `<div class="empty" style="padding:12px;"><small class="hint">Aucun compte enregistré pour l'instant.</small></div>`; return; }
+  const sorted = [...users].sort((a,b)=> (a.username||"").localeCompare(b.username||""));
+  zone.innerHTML = sorted.map(u=>{
+    const banned = bannedSet.has(u.norm);
+    return `<div class="notion-item" style="cursor:default; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+      <span style="font-weight:700;">${escapeHtml(u.username)}${banned ? ' <span class="tag" style="background:#FBEAEB; color:var(--danger);">Banni</span>' : ''}</span>
+      <button class="btn ${banned?'btn-mint':'btn-danger'} btn-sm" data-toggle-ban="${escapeHtml(u.norm)}" data-ban-name="${escapeHtml(u.username)}" data-currently-banned="${banned?'1':'0'}">${banned?'Débannir':'Bannir'}</button>
+    </div>`;
+  }).join("");
+  document.querySelectorAll('[data-toggle-ban]').forEach(b=> b.addEventListener('click', ()=>{
+    const norm = b.dataset.toggleBan, name = b.dataset.banName, currentlyBanned = b.dataset.currentlyBanned==='1';
+    const msg = currentlyBanned ? `Redonner l'accès à "${name}" ?` : `Bannir "${name}" ? Il ne pourra plus se connecter au site.`;
+    showConfirmModal(msg, async ()=>{
+      const cur = (await getJSON('banned-usernames', true)) || [];
+      const updated = currentlyBanned ? cur.filter(n=>n!==norm) : [...new Set([...cur, norm])];
+      const ok = await setJSON('banned-usernames', updated, true);
+      showToast(ok ? (currentlyBanned?"Accès restauré.":"Compte banni.") : "❌ Échec, réessaie.");
+      loadUsersListZone();
+    });
+  }));
+}
+async function loadLoginCodesZone(){
+  const zone = document.getElementById('login-codes-zone'); if(!zone) return;
+  const list = await safeStorage.list('login-code:', true).catch(()=>null);
+  const keys = (list && list.keys) || [];
+  if(!keys.length){ zone.innerHTML = `<div class="empty" style="padding:14px;"><small class="hint">Aucun code de connexion en attente.</small></div>`; return; }
+  const rows = [];
+  for(const k of keys){ const v = await getJSON(k, true); if(v && v.code) rows.push(v); }
+  rows.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+  zone.innerHTML = rows.map(r=>`
+    <div class="pending-item">
+      <div style="font-weight:700;">${escapeHtml(r.username)}</div>
+      <div style="font-size:24px; font-weight:800; letter-spacing:4px; color:var(--lavender); margin:4px 0;">${escapeHtml(r.code)}</div>
+      <div style="font-size:11px; color:var(--muted);">${r.createdAt ? new Date(r.createdAt).toLocaleString('fr-FR') : ''}</div>
+    </div>`).join("");
+}
+async function linkNotionFlow(id){
+  const others = state.notionsIndex.filter(n=> n.id!==id);
+  if(!others.length){ showToast("Aucune autre notion."); return; }
+  openModal(`
+    <label class="field-label">Lier à quelle notion ?</label>
+    <div style="max-height:320px; overflow-y:auto; margin:8px 0 12px;">
+      ${others.map(n=>`<button class="option-btn" data-link-target="${n.id}">${escapeHtml(n.title)}</button>`).join("")}
+    </div>
+    <button class="btn btn-outline btn-block" id="modal-cancel">Annuler</button>`);
+  const mCancel = document.getElementById('modal-cancel');
+  if(mCancel) mCancel.addEventListener('click', closeModal);
+  document.querySelectorAll('[data-link-target]').forEach(b=> b.addEventListener('click', async ()=>{
+    const targetId = b.dataset.linkTarget; closeModal();
+    const target = others.find(o=>o.id===targetId); if(!target) return;
+    const notionA = await getJSON('notion:'+id, true); const notionB = await getJSON('notion:'+targetId, true);
+    if(!notionA || !notionB) return;
+    notionA.linkedTo = [...(notionA.linkedTo||[]).filter(l=>l.id!==targetId), {id:targetId, title:notionB.title}];
+    notionB.linkedTo = [...(notionB.linkedTo||[]).filter(l=>l.id!==id), {id:id, title:notionA.title}];
+    await setJSON('notion:'+id, notionA, true); await setJSON('notion:'+targetId, notionB, true);
+    showToast("Notions liées !");
+  }));
+}
+async function handleAdminImages(files){
+  const zone = document.getElementById('admin-form-zone');
+  if(!zone) return;
+  zone.innerHTML = `<div class="empty"><span class="spinner spinner-dark"></span><br>Analyse de ${files.length} image(s)...</div>`;
+  try{
+    const contentBlocks = [];
+    for(const f of files){ const base64 = await fileToBase64(f); contentBlocks.push({ type:"image", source:{ type:"base64", media_type: f.type||"image/jpeg", data: base64 } }); }
+    const existingTitles = state.notionsIndex.map(n=> `"${n.title}" (${n.category}${n.classe ? ', '+n.classe : ''})`).join(", ") || "aucune";
+    // "classe" (niveau scolaire, ex: Terminale D) et "category" (matière, ex: Mathématiques)
+    // sont maintenant deux champs distincts : avant, une seule "catégorie" mélangeait les deux,
+    // ce qui rendait le classement et le renommage par classe peu fiables.
+    contentBlocks.push({ type:"text", text: `Ces images montrent un cours ou un exercice. Notions déjà existantes : ${existingTitles}. Classe le contenu de façon ordonnée et réponds UNIQUEMENT en JSON :\n{"title":"titre précis de la leçon","classe":"niveau scolaire si identifiable, ex: Terminale D (sinon chaîne vide)","category":"matière, ex: Mathématiques, Anglais, Physique","tags":"mots-clés séparés par des virgules","content":"résumé structuré et complet du cours, classé par sous-parties","exercise":"énoncé","possibleLink":"titre exact d'une notion existante si lié, sinon chaîne vide"}` });
+    const text = await askClaude([{ role:"user", content: contentBlocks }], { maxTokens: 1100 });
+    const parsed = parseJsonLoose(text);
+    if(!parsed){ zone.innerHTML = `<div class="empty">Analyse impossible.</div>`; return; }
+    window.__pendingNotion = parsed;
+    zone.innerHTML = `<div class="card">
+      ${parsed.possibleLink ? `<div class="pending-item">🔗 Lié à <strong>${escapeHtml(parsed.possibleLink)}</strong>.</div>` : ""}
+      <label class="field-label">Titre de la leçon</label><input type="text" id="edit-title" value="${escapeHtml(parsed.title||"")}" style="margin:0 0 12px;">
+      <div class="grid2" style="margin-bottom:12px;">
+        <div><label class="field-label">Classe</label><input type="text" id="edit-classe" value="${escapeHtml(parsed.classe||"")}" placeholder="Ex : Terminale D"></div>
+        <div><label class="field-label">Matière</label><input type="text" id="edit-category" value="${escapeHtml(parsed.category||"")}" placeholder="Ex : Mathématiques"></div>
+      </div>
+      <label class="field-label">Tags</label><input type="text" id="edit-tags" value="${escapeHtml(parsed.tags||"")}" style="margin:0 0 12px;">
+      <label class="field-label">Contenu</label><textarea id="edit-content" style="margin:0 0 12px; min-height:120px;">${escapeHtml(parsed.content||"")}</textarea>
+      <label class="field-label">Exercice (optionnel)</label><textarea id="edit-exercise" style="margin:0 0 12px;">${escapeHtml(parsed.exercise||"")}</textarea>
+      <button class="btn btn-primary btn-block" id="save-notion-btn">Ajouter à la base</button>
+    </div>`;
+    const saveBtn = document.getElementById('save-notion-btn');
+    if(saveBtn) saveBtn.addEventListener('click', saveNewNotion);
+  }catch(e){ console.error(e); zone.innerHTML = `<div class="empty">❌ ${escapeHtml(e.message || "Erreur inconnue.")}</div>`; }
+}
+async function saveNewNotion(){
+  const title = document.getElementById('edit-title').value.trim();
+  const classe = document.getElementById('edit-classe').value.trim();
+  const category = document.getElementById('edit-category').value.trim() || "Général";
+  const tags = document.getElementById('edit-tags').value.trim();
+  const content = document.getElementById('edit-content').value.trim();
+  const exerciseText = document.getElementById('edit-exercise').value.trim();
+  if(!title || !content){ showToast("Titre et contenu obligatoires."); return; }
+  const id = uid();
+  const exercises = exerciseText ? [{ id: uid(), text: exerciseText }] : [];
+  let linkedTo = [];
+  const possibleLink = window.__pendingNotion && window.__pendingNotion.possibleLink;
+  if(possibleLink){
+    const match = state.notionsIndex.find(n=> normalize(n.title)===normalize(possibleLink));
+    if(match){
+      linkedTo = [{ id: match.id, title: match.title }];
+      const other = await getJSON('notion:'+match.id, true);
+      if(other){ other.linkedTo = [...(other.linkedTo||[]), {id, title}]; await setJSON('notion:'+match.id, other, true); }
+    }
+  }
+  await setJSON('notion:'+id, { id, title, classe, category, tags, content, exercises, linkedTo }, true);
+  const newIndex = [...state.notionsIndex, { id, title, classe, category, tags, exerciseCount: exercises.length }];
+  await setJSON('notions-index', newIndex, true);
+  setState({ notionsIndex:newIndex }); showToast("Notion ajoutée !");
+  const aForm = document.getElementById('admin-form-zone');
+  if(aForm) aForm.innerHTML = "";
+}
+async function loadPendingZone(){
+  const zone = document.getElementById('pending-zone'); if(!zone) return;
+  const pending = (await getJSON('pending-notions', true)) || [];
+  if(!pending.length){ zone.innerHTML = ""; return; }
+  zone.innerHTML = `<h3 style="margin:14px 0 10px;">📥 Propositions (${pending.length})</h3>` + pending.map(p=>`
+    <div class="pending-item">
+      <div style="font-weight:700; margin-bottom:4px;">${escapeHtml(p.title)}</div>
+      <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">Par ${escapeHtml(p.proposedBy)}</div>
+      <div style="font-size:12.5px; max-height:80px; overflow:hidden; margin-bottom:8px;">${escapeHtml((p.content||"").slice(0,200))}...</div>
+      <div class="row"><button class="btn btn-mint btn-sm" data-approve="${p.id}" style="flex:1;">✅ Valider</button><button class="btn btn-danger btn-sm" data-reject="${p.id}" style="flex:1;">✖ Refuser</button></div>
+    </div>`).join("");
+  document.querySelectorAll('[data-approve]').forEach(b=> b.addEventListener('click', ()=> approvePending(b.dataset.approve, pending)));
+  document.querySelectorAll('[data-reject]').forEach(b=> b.addEventListener('click', ()=> rejectPending(b.dataset.reject, pending)));
+}
+async function approvePending(id, pending){
+  const item = pending.find(p=>p.id===id); if(!item) return;
+  const newId = uid();
+  await setJSON('notion:'+newId, { id:newId, title:item.title, classe:item.classe||"", category:item.category, tags:item.tags||"", content:item.content, exercises:[], linkedTo:[] }, true);
+  const newIndex = [...state.notionsIndex, { id:newId, title:item.title, classe:item.classe||"", category:item.category, tags:item.tags||"", exerciseCount:0 }];
+  await setJSON('notions-index', newIndex, true);
+  const remaining = pending.filter(p=>p.id!==id);
+  await setJSON('pending-notions', remaining, true);
+  setState({ notionsIndex:newIndex }); showToast("Notion validée !");
+  loadPendingZone();
+}
+async function rejectPending(id, pending){
+  const remaining = pending.filter(p=>p.id!==id);
+  await setJSON('pending-notions', remaining, true);
+  showToast("Refusé."); loadPendingZone();
+}
+async function showOverview(){
+  const zone = document.getElementById('overview-zone');
+  if(!zone) return;
+  const list = await safeStorage.list('score:', true).catch(()=>null);
+  const nbUsers = list && list.keys ? list.keys.length : 0;
+  const totalExos = state.notionsIndex.reduce((s,n)=> s+(n.exerciseCount||0), 0);
+  zone.innerHTML = `<div class="card">
+    <div style="font-size:13.5px; margin-bottom:6px;">📚 Notions : <strong>${state.notionsIndex.length}</strong></div>
+    <div style="font-size:13.5px; margin-bottom:6px;">📝 Exercices : <strong>${totalExos}</strong></div>
+    <div style="font-size:13.5px;">👥 Utilisateurs : <strong>${nbUsers}</strong></div>
+  </div>`;
+}
+
+// ---------- Boot ----------
+init();
+</script>
+</body>
+</html>
